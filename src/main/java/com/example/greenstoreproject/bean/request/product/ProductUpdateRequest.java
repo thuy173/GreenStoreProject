@@ -9,40 +9,29 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Data
-public class ProductRequest {
+public class ProductUpdateRequest {
 
-    @NotNull(message = "Product name is required")
-    @Size(min = 2, max = 200, message = "Product name must be between 2 and 200 characters")
+    @Size(max = 200, message = "Product name must be between 2 and 200 characters")
     private String productName;
 
-    @NotNull(message = "Price is required")
     @DecimalMin(value = "0.0", inclusive = false, message = "Price must be greater than 0")
-    private double price;
+    private Double price;
 
-    @NotNull(message = "Quantity in stock is required")
     @Min(value = 0, message = "Quantity in stock must be non-negative")
     private Long quantityInStock;
 
     @Size(max = 700, message = "Description can be up to 700 characters")
     private String description;
 
-    @NotNull(message = "Manufacture date is required")
     private LocalDate manufactureDate;
 
-    @NotNull(message = "Expiry date is required")
     @FutureOrPresent(message = "Expiry date must be in the present or future")
     private LocalDate expiryDate;
 
-    @NotNull(message = "Unit of measure is required")
     private UnitOfMeasure unitOfMeasure;
 
-    @NotNull(message = "Category ID is required")
     private Long categoryId;
 
-    @NotEmpty(message = "Nutrient IDs are required")
     private List<Long> nutrientIds;
-
-    @NotEmpty(message = "At least one product image is required")
-    private List<MultipartFile> productImages;
-
+    
 }
