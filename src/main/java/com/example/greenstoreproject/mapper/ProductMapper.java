@@ -1,6 +1,7 @@
 package com.example.greenstoreproject.mapper;
 
 import com.example.greenstoreproject.bean.request.product.ProductRequest;
+import com.example.greenstoreproject.bean.request.product.ProductUpdateRequest;
 import com.example.greenstoreproject.bean.response.nutrient.NutrientResponse;
 import com.example.greenstoreproject.bean.response.product.ProductDetailResponse;
 import com.example.greenstoreproject.bean.response.product.ProductResponse;
@@ -27,6 +28,7 @@ public class ProductMapper {
         dto.setImageUrl(image.getImageUrl());
         return dto;
     }
+
     public ProductResponse convertToProductResponse(Products products) {
         ProductResponse productResponse = new ProductResponse();
         productResponse.setProductId(products.getProductId());
@@ -86,14 +88,45 @@ public class ProductMapper {
         products.setCategory(category);
         products.setNutrients(nutrients);
         products.setProductImages(productImages);
+
+        for (ProductImages image : productImages) {
+            image.setProduct(products);
+        }
+
         return products;
     }
 
-    public static void updateProductFromRequest(Products products, ProductRequest productRequest) {
-        products.setProductName(productRequest.getProductName());
-        products.setDescription(productRequest.getDescription());
-        products.setPrice(productRequest.getPrice());
-        products.setQuantityInStock(productRequest.getQuantityInStock());
+    public static void updateProductFromRequest(Products products, ProductUpdateRequest productRequest, Categories category,
+                                                List<Nutrients> nutrients
+    ) {
+        if (productRequest.getProductName() != null && !productRequest.getProductName().isEmpty()) {
+            products.setProductName(productRequest.getProductName());
+        }
+        if (productRequest.getDescription() != null && !productRequest.getDescription().isEmpty()) {
+            products.setDescription(productRequest.getDescription());
+        }
+        if (productRequest.getPrice() != null) {
+            products.setPrice(productRequest.getPrice());
+        }
+        if (productRequest.getQuantityInStock() != null) {
+            products.setQuantityInStock(productRequest.getQuantityInStock());
+        }
+        if (productRequest.getManufactureDate() != null) {
+            products.setManufactureDate(productRequest.getManufactureDate());
+        }
+        if (productRequest.getExpiryDate() != null) {
+            products.setExpiryDate(productRequest.getExpiryDate());
+        }
+        if (productRequest.getUnitOfMeasure() != null) {
+            products.setUnitOfMeasure(productRequest.getUnitOfMeasure());
+        }
+        if (category != null) {
+            products.setCategory(category);
+        }
+        if (nutrients != null && !nutrients.isEmpty()) {
+            products.setNutrients(nutrients);
+        }
+
 
     }
 }

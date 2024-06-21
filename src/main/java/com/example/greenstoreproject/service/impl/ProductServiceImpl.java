@@ -3,6 +3,7 @@ package com.example.greenstoreproject.service.impl;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import com.example.greenstoreproject.bean.request.product.ProductRequest;
+import com.example.greenstoreproject.bean.request.product.ProductUpdateRequest;
 import com.example.greenstoreproject.bean.response.nutrient.NutrientResponse;
 import com.example.greenstoreproject.bean.response.product.ProductDetailResponse;
 import com.example.greenstoreproject.bean.response.product.ProductResponse;
@@ -27,6 +28,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -88,12 +90,51 @@ public class ProductServiceImpl implements ProductService {
 
 
     @Override
-    public String updateProduct(Long id, ProductRequest productRequest) {
+    public String updateProduct(Long id, ProductUpdateRequest productRequest) {
         Products products = productRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Product not found " + id));
-        productMapper.updateProductFromRequest(products, productRequest);
+
+        Categories category = null;
+        if (productRequest.getCategoryId() != null) {
+            category = categoryRepository.findById(productRequest.getCategoryId())
+                    .orElseThrow(() -> new NotFoundException("Category not found " + productRequest.getCategoryId()));
+        }
+
+        List<Nutrients> nutrients = null;
+        if (productRequest.getNutrientIds() != null && !productRequest.getNutrientIds().isEmpty()) {
+            nutrients = nutrientRepository.findAllById(productRequest.getNutrientIds());
+        }
+
+
+
+        productMapper.updateProductFromRequest(products, productRequest, category, nutrients);
         productRepository.save(products);
         return SuccessMessage.SUCCESS_UPDATED.getMessage();
+    }
+
+    @Override
+    public String updateProductImage(Long productId, int index, MultipartFile newImage) {
+        Products product = productRepository.findById(productId)
+                .orElseThrow(() -> new NotFoundException("Product not found " + productId));
+
+        if (index < 0 || index >= product.getProductImages().size()) {
+            throw new IllegalArgumentException("Invalid image index");
+        }
+
+        try {
+            Map uploadResult = cloudinary.uploader().upload(newImage.getBytes(), ObjectUtils.emptyMap());
+            String newImageUrl = uploadResult.get("url").toString();
+
+            ProductImages productImage = product.getProductImages().get(index);
+            productImage.setImageUrl(newImageUrl);
+            productImage.setProduct(product);
+
+            productRepository.save(product);
+
+            return SuccessMessage.SUCCESS_UPDATED.getMessage();
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to upload image", e);
+        }
     }
 
     @Override

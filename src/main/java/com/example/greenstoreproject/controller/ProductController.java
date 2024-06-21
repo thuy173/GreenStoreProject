@@ -1,6 +1,7 @@
 package com.example.greenstoreproject.controller;
 
 import com.example.greenstoreproject.bean.request.product.ProductRequest;
+import com.example.greenstoreproject.bean.request.product.ProductUpdateRequest;
 import com.example.greenstoreproject.bean.response.product.ProductDetailResponse;
 import com.example.greenstoreproject.bean.response.product.ProductResponse;
 import com.example.greenstoreproject.service.ProductService;
@@ -38,10 +39,18 @@ public class ProductController {
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    @PutMapping("/{id}")
-    public String updateProduct(@PathVariable Long id, @Valid @RequestBody ProductRequest productRequest) {
+    @PutMapping(value="/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public String updateProduct(@PathVariable Long id, @Valid @ModelAttribute ProductUpdateRequest productRequest) {
         return productService.updateProduct(id, productRequest);
     }
+
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PutMapping(value="/{id}/images/{index}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public String updateProductImage(@PathVariable Long id, @PathVariable int index,
+                                     @RequestParam("image") MultipartFile image) {
+        return productService.updateProductImage(id, index, image);
+    }
+
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @DeleteMapping("/{id}")
