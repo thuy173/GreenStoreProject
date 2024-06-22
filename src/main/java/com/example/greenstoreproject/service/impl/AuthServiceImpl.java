@@ -34,4 +34,9 @@ public class AuthServiceImpl implements UserDetailsService {
         }
         return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), authorities);
     }
+
+    public Long getCustomerIdByEmail(String email) {
+        Customers customer = customerRepository.findByEmail(email);
+        return customer != null ? customer.getCustomerId() : null;
+    }
 }

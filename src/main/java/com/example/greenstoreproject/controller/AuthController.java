@@ -44,8 +44,10 @@ public class AuthController {
         final UserDetails userDetails = userService.loadUserByUsername(
                 authenticationRequest.getEmail()
         );
+        final Long customerId = userService.getCustomerIdByEmail(authenticationRequest.getEmail());
 
-        final String jwt = jwtUtil.generateToken(userDetails);
+
+        final String jwt = jwtUtil.generateToken(userDetails, customerId);
         return jwt;
     }
 }
