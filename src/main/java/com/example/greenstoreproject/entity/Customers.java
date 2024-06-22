@@ -30,5 +30,7 @@ public class Customers {
     @Column(name = "address")
     private String address;
 
+    @OneToOne(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Carts cart;
 
 }

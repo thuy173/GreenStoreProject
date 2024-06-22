@@ -20,10 +20,10 @@ public class Products {
     private String productName;
 
     @Column(name = "price")
-    private double price;
+    private Double price;
 
     @Column(name = "quantity_in_stock")
-    private Long quantityInStock;
+    private Double quantityInStock;
 
     @Column(name = "description")
     private String description;

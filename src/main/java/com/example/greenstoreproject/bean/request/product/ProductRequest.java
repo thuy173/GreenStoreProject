@@ -17,11 +17,11 @@ public class ProductRequest {
 
     @NotNull(message = "Price is required")
     @DecimalMin(value = "0.0", inclusive = false, message = "Price must be greater than 0")
-    private double price;
+    private Double price;
 
     @NotNull(message = "Quantity in stock is required")
-    @Min(value = 0, message = "Quantity in stock must be non-negative")
-    private Long quantityInStock;
+    @DecimalMin(value = "0.0", inclusive = false, message = "Quantity in stock must be non-negative")
+    private Double quantityInStock;
 
     @Size(max = 700, message = "Description can be up to 700 characters")
     private String description;

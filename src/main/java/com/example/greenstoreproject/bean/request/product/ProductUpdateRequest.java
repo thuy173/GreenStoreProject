@@ -18,7 +18,7 @@ public class ProductUpdateRequest {
     private Double price;
 
     @Min(value = 0, message = "Quantity in stock must be non-negative")
-    private Long quantityInStock;
+    private Double quantityInStock;
 
     @Size(max = 700, message = "Description can be up to 700 characters")
     private String description;

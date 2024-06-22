@@ -16,9 +16,9 @@ public class ProductDetailResponse {
 
     private String productName;
 
-    private double price;
+    private Double price;
 
-    private Long quantityInStock;
+    private Double quantityInStock;
 
     private String description;
 
