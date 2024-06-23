@@ -19,6 +19,9 @@ public class Carts {
     @JoinColumn(name = "customer_id")
     private Customers customer;
 
+    @Column(name = "cart_uuid", unique = true)
+    private String cartUuid;
+
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CartItems> cartItems = new ArrayList<>();
 }

@@ -19,7 +19,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -31,36 +33,55 @@ public class CartServiceImpl implements CartService {
     private final CustomerRepository customerRepository;
 
     @Override
-    public CartResponse getCartByCustomerId(Long customerId) {
-        if (!hasAccess(customerId)) {
-            throw new RuntimeException("Access Denied");
+    public CartResponse getCartByCustomerIdOrUuid(Long customerId, String cartUuid) {
+        Carts cart = null;
+
+        if (customerId != null) {
+            if (!hasAccess(customerId)) {
+                throw new RuntimeException("Access Denied");
+            }
+            cart = cartRepository.findByCustomerCustomerId(customerId);
+        } else if (cartUuid != null) {
+            cart = cartRepository.findByCartUuid(cartUuid);
         }
 
-        Carts cart = cartRepository.findByCustomerCustomerId(customerId);
         if (cart == null) {
             cart = new Carts();
-            Customers customer = new Customers();
-            customer.setCustomerId(customerId);
-            cart.setCustomer(customer);
+            cart.setCartUuid(cartUuid != null ? cartUuid : UUID.randomUUID().toString());
+            if (customerId != null) {
+                Customers customer = new Customers();
+                customer.setCustomerId(customerId);
+                cart.setCustomer(customer);
+            }
             cart = cartRepository.save(cart);
         }
         return cartMapper.mapToCartResponse(cart);
     }
 
     @Override
-    public CartResponse addItemToCart(Long customerId, CartItemRequest cartItemRequest) {
-        if (!hasAccess(customerId)) {
-            throw new RuntimeException("Access Denied");
+    public CartResponse addItemToCart(Long customerId, String cartUuid, CartItemRequest cartItemRequest) {
+        Carts carts = null;
+
+        if (customerId != null) {
+            if (!hasAccess(customerId)) {
+                throw new RuntimeException("Access Denied");
+            }
+            carts = cartRepository.findByCustomerCustomerId(customerId);
+        } else if (cartUuid != null) {
+            carts = cartRepository.findByCartUuid(cartUuid);
         }
 
-        Carts carts = cartRepository.findByCustomerCustomerId(customerId);
-
-        if(carts == null) {
+        if (carts == null) {
             carts = new Carts();
-            Customers customer = new Customers();
-            customer.setCustomerId(customerId);
-            carts.setCustomer(customer);
+            carts.setCartUuid(cartUuid != null ? cartUuid : UUID.randomUUID().toString());
+            if (customerId != null) {
+                Customers customer = new Customers();
+                customer.setCustomerId(customerId);
+                carts.setCustomer(customer);
+            }
+            carts = cartRepository.save(carts);
         }
+
         Products product = productRepository.findById(cartItemRequest.getProductId())
                 .orElseThrow(() -> new RuntimeException("Product not found"));
 
@@ -83,19 +104,66 @@ public class CartServiceImpl implements CartService {
             carts.getCartItems().add(newCartItem);
         }
 
-
         cartRepository.save(carts);
 
         return cartMapper.mapToCartResponse(carts);
     }
 
     @Override
-    public CartResponse removeItemFromCart(Long userId, Long cartItemId) {
-        if (!hasAccess(userId)) {
-            throw new RuntimeException("Access Denied");
+    public CartResponse mergeCartUponLogin(Long customerId, String cartUuid) {
+        Carts tempCart = cartRepository.findByCartUuid(cartUuid);
+        Carts customerCart = cartRepository.findByCustomerCustomerId(customerId);
+
+        if (tempCart == null) {
+            if (customerCart == null) {
+                customerCart = new Carts();
+                customerCart.setCartUuid(UUID.randomUUID().toString());
+                Customers customer = new Customers();
+                customer.setCustomerId(customerId);
+                customerCart.setCustomer(customer);
+                customerCart = cartRepository.save(customerCart);
+            }
+            return cartMapper.mapToCartResponse(customerCart);
         }
 
-        Carts cart = cartRepository.findByCustomerCustomerId(userId);
+        if (customerCart == null) {
+            tempCart.setCustomer(customerRepository.findById(customerId).orElse(null));
+            tempCart = cartRepository.save(tempCart);
+            return cartMapper.mapToCartResponse(tempCart);
+        }
+
+        mergeCartItems(customerCart, tempCart.getCartItems());
+
+        cartRepository.delete(tempCart);
+
+        customerCart = cartRepository.save(customerCart);
+
+        return cartMapper.mapToCartResponse(customerCart);
+    }
+
+    private void mergeCartItems(Carts customerCart, List<CartItems> tempCartItems) {
+        for (CartItems tempItem : tempCartItems) {
+            Optional<CartItems> existingItemOpt = customerCart.getCartItems().stream()
+                    .filter(item -> item.getProduct().getProductId().equals(tempItem.getProduct().getProductId()))
+                    .findFirst();
+
+            if (existingItemOpt.isPresent()) {
+                CartItems existingItem = existingItemOpt.get();
+                existingItem.setQuantity(existingItem.getQuantity() + tempItem.getQuantity());
+            } else {
+                CartItems newItem = new CartItems();
+                newItem.setCart(customerCart);
+                newItem.setProduct(tempItem.getProduct());
+                newItem.setQuantity(tempItem.getQuantity());
+                customerCart.getCartItems().add(newItem);
+            }
+        }
+    }
+
+    @Override
+    public CartResponse removeItemFromCart(Long userId, String cartUuid, Long cartItemId) {
+        Carts cart = getCartByUserIdOrUuid(userId, cartUuid);
+
         if (cart == null) {
             throw new RuntimeException("Cart not found");
         }
@@ -110,12 +178,9 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public CartResponse updateItemQuantity(Long userId, Long cartItemId, int quantity) {
-        if (!hasAccess(userId)) {
-            throw new RuntimeException("Access Denied");
-        }
+    public CartResponse updateItemQuantity(Long userId, String cartUuid, Long cartItemId, Double quantity) {
+        Carts cart = getCartByUserIdOrUuid(userId, cartUuid);
 
-        Carts cart = cartRepository.findByCustomerCustomerId(userId);
         if (cart == null) {
             throw new RuntimeException("Cart not found");
         }
@@ -130,19 +195,29 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public void clearCart(Long userId) {
-        if (!hasAccess(userId)) {
-            throw new RuntimeException("Access Denied");
-        }
+    public void clearCart(Long userId, String cartUuid) {
+        Carts cart = getCartByUserIdOrUuid(userId, cartUuid);
 
-        Carts cart = cartRepository.findByCustomerCustomerId(userId);
         if (cart != null) {
             cart.getCartItems().clear();
             cartRepository.save(cart);
         }
     }
 
-    public boolean hasAccess(Long customerId) {
+    private Carts getCartByUserIdOrUuid(Long userId, String cartUuid) {
+        Carts cart = null;
+        if (userId != null) {
+            if (!hasAccess(userId)) {
+                throw new RuntimeException("Access Denied");
+            }
+            cart = cartRepository.findByCustomerCustomerId(userId);
+        } else if (cartUuid != null) {
+            cart = cartRepository.findByCartUuid(cartUuid);
+        }
+        return cart;
+    }
+
+    private boolean hasAccess(Long customerId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
             return false;
@@ -159,3 +234,4 @@ public class CartServiceImpl implements CartService {
         return currentCustomer != null && currentCustomer.getCustomerId().equals(customerId);
     }
 }
+

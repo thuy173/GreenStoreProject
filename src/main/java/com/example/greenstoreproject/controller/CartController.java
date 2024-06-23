@@ -15,28 +15,64 @@ import org.springframework.web.bind.annotation.*;
 public class CartController {
     private final CartService cartService;
 
-    @GetMapping("/{customerId}")
-    public CartResponse getCart(@PathVariable Long customerId) {
-        return cartService.getCartByCustomerId(customerId);
+    @GetMapping("/{customerIdOrUuid}")
+    public CartResponse getCart(@PathVariable String customerIdOrUuid) {
+        Long customerId = null;
+        String cartUuid = null;
+        try {
+            customerId = Long.parseLong(customerIdOrUuid);
+        } catch (NumberFormatException e) {
+            cartUuid = customerIdOrUuid;
+        }
+        return cartService.getCartByCustomerIdOrUuid(customerId, cartUuid);
     }
 
-    @PostMapping("/{customerId}/items")
-    public CartResponse addItemToCart(@PathVariable Long customerId, @Valid @RequestBody CartItemRequest cartItemRequest) {
-        return cartService.addItemToCart(customerId, cartItemRequest);
+
+    @PostMapping("/{customerIdOrUuid}/items")
+    public CartResponse addItemToCart(@PathVariable String customerIdOrUuid, @Valid @RequestBody CartItemRequest cartItemRequest) {
+        Long customerId = null;
+        String cartUuid = null;
+        try {
+            customerId = Long.parseLong(customerIdOrUuid);
+        } catch (NumberFormatException e) {
+            cartUuid = customerIdOrUuid;
+        }
+        return cartService.addItemToCart(customerId, cartUuid, cartItemRequest);
     }
 
-    @PutMapping("/{customerId}/items/{cartItemId}")
-    public CartResponse updateItemQuantity(@PathVariable Long customerId, @PathVariable Long cartItemId, @RequestParam int quantity) {
-        return cartService.updateItemQuantity(customerId, cartItemId, quantity);
+    @PutMapping("/{customerIdOrUuid}/items/{cartItemId}")
+    public CartResponse updateItemQuantity(@PathVariable String customerIdOrUuid, @PathVariable Long cartItemId, @RequestParam Double quantity) {
+        Long customerId = null;
+        String cartUuid = null;
+        try {
+            customerId = Long.parseLong(customerIdOrUuid);
+        } catch (NumberFormatException e) {
+            cartUuid = customerIdOrUuid;
+        }
+        return cartService.updateItemQuantity(customerId, cartUuid, cartItemId, quantity);
     }
 
-    @DeleteMapping("/{customerId}/items/{cartItemId}")
-    public CartResponse removeItemFromCart(@PathVariable Long customerId, @PathVariable Long cartItemId) {
-        return cartService.removeItemFromCart(customerId, cartItemId);
+    @DeleteMapping("/{customerIdOrUuid}/items/{cartItemId}")
+    public CartResponse removeItemFromCart(@PathVariable String customerIdOrUuid, @PathVariable Long cartItemId) {
+        Long customerId = null;
+        String cartUuid = null;
+        try {
+            customerId = Long.parseLong(customerIdOrUuid);
+        } catch (NumberFormatException e) {
+            cartUuid = customerIdOrUuid;
+        }
+        return cartService.removeItemFromCart(customerId, cartUuid, cartItemId);
     }
 
-    @DeleteMapping("/{customerId}/clear")
-    public void clearCart(@PathVariable Long customerId) {
-        cartService.clearCart(customerId);
+    @DeleteMapping("/{customerIdOrUuid}/clear")
+    public void clearCart(@PathVariable String customerIdOrUuid) {
+        Long customerId = null;
+        String cartUuid = null;
+        try {
+            customerId = Long.parseLong(customerIdOrUuid);
+        } catch (NumberFormatException e) {
+            cartUuid = customerIdOrUuid;
+        }
+        cartService.clearCart(customerId, cartUuid);
     }
 }

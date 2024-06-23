@@ -7,13 +7,15 @@ import org.springframework.stereotype.Service;
 @Service
 public interface CartService {
 
-    CartResponse getCartByCustomerId(Long customerId);
+    CartResponse getCartByCustomerIdOrUuid(Long customerId, String cartUuid);
 
-    CartResponse addItemToCart(Long userId, CartItemRequest cartItemRequest);
+    CartResponse addItemToCart(Long userId, String cartUuid, CartItemRequest cartItemRequest);
 
-    CartResponse removeItemFromCart(Long userId, Long cartItemId);
+    CartResponse mergeCartUponLogin(Long customerId, String cartUuid);
 
-    CartResponse updateItemQuantity(Long userId, Long cartItemId, int quantity);
+    CartResponse removeItemFromCart(Long userId, String cartUuid, Long cartItemId);
 
-    void clearCart(Long userId);
+    CartResponse updateItemQuantity(Long userId, String cartUuid, Long cartItemId, Double quantity);
+
+    void clearCart(Long userId, String cartUuid);
 }

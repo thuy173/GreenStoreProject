@@ -4,11 +4,14 @@ import com.example.greenstoreproject.bean.request.customer.CustomerRegisterReque
 import com.example.greenstoreproject.entity.Customers;
 import com.example.greenstoreproject.mapper.AuthMapper;
 import com.example.greenstoreproject.repository.CustomerRepository;
+import com.example.greenstoreproject.service.CartService;
 import com.example.greenstoreproject.service.impl.AuthServiceImpl;
 import com.example.greenstoreproject.service.impl.CustomerServiceImpl;
 import com.example.greenstoreproject.util.JwtUtil;
 import com.example.greenstoreproject.bean.request.customer.CustomerLoginRequest;
 
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -19,6 +22,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.util.WebUtils;
 
 
 @RestController
@@ -29,6 +33,7 @@ public class AuthController {
     private final JwtUtil jwtUtil;
     private final AuthenticationManager authenticationManager;
     private final CustomerServiceImpl customerService;
+    private final CartService cartService;
 
     @PostMapping("/register")
     public String register(@Valid @RequestBody CustomerRegisterRequest customerRegisterRequest){
@@ -37,7 +42,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public String loginUser(@Valid @RequestBody CustomerLoginRequest authenticationRequest) throws Exception{
+    public String loginUser(@Valid @RequestBody CustomerLoginRequest authenticationRequest, HttpServletRequest request) throws Exception{
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authenticationRequest.getEmail(),
                 authenticationRequest.getPassword()));
 
@@ -46,8 +51,30 @@ public class AuthController {
         );
         final Long customerId = userService.getCustomerIdByEmail(authenticationRequest.getEmail());
 
+        String cartUuid = getCartUuidFromRequest(request);
 
+        // Merge carts upon login
+        cartService.mergeCartUponLogin(customerId, cartUuid);
         final String jwt = jwtUtil.generateToken(userDetails, customerId);
         return jwt;
+    }
+
+    private String getCartUuidFromRequest(HttpServletRequest request) {
+        String cartUuid = request.getHeader("X-CART_UUID");
+        if (cartUuid != null && !cartUuid.isEmpty()) {
+            return cartUuid;
+        }
+
+        Cookie cartUuidCookie = WebUtils.getCookie(request, "CART_UUID");
+        if (cartUuidCookie != null) {
+            return cartUuidCookie.getValue();
+        }
+
+        cartUuid = request.getParameter("CART_UUID");
+        if (cartUuid != null && !cartUuid.isEmpty()) {
+            return cartUuid;
+        }
+
+        return null;
     }
 }
