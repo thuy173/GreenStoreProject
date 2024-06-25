@@ -12,6 +12,7 @@ public class CartItemResponse {
     private String productName;
     private Double price;
     private Double quantity;
+    private Double totalPrice;
     private String description;
     private Double quantityInStock;
     private List<ProductImageResponse> productImages;

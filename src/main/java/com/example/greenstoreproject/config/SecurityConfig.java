@@ -52,6 +52,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/nutrient").permitAll()
                         .requestMatchers("/api/nutrient/{id}").permitAll()
                         .requestMatchers("/api/cart/**").permitAll()
+                        .requestMatchers("/api/order/**").permitAll()
                         .requestMatchers(AUTH_WHITELIST).permitAll()
                         .anyRequest().authenticated()
                 )

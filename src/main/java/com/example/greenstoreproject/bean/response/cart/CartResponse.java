@@ -9,5 +9,6 @@ import java.util.List;
 public class CartResponse {
     private Long cartId;
     private Long customerId;
+    private Double totalPrice;
     private List<CartItemResponse> cartItem;
 }

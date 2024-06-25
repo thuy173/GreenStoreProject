@@ -43,6 +43,12 @@ public class CartMapper {
         cartItemResponse.setQuantityInStock(cartItem.getProduct().getQuantityInStock());
         cartItemResponse.setDescription(cartItem.getProduct().getDescription());
         cartItemResponse.setProductImages(mapToProductImageResponses(cartItem.getProduct().getProductImages()));
+
+        if (cartItem.getQuantity() != null && cartItem.getQuantity() > 0) {
+            cartItemResponse.setTotalPrice(cartItem.getQuantity() * cartItem.getProduct().getPrice());
+        } else {
+            cartItemResponse.setTotalPrice(0.0);
+        }
         return cartItemResponse;
     }
     private List<ProductImageResponse> mapToProductImageResponses(List<ProductImages> productImages) {
