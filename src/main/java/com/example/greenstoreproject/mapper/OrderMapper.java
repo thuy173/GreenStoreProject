@@ -1,50 +1,130 @@
 package com.example.greenstoreproject.mapper;
 
 import com.example.greenstoreproject.bean.request.order.OrderRequest;
+import com.example.greenstoreproject.bean.request.orderItem.OrderItemRequest;
 import com.example.greenstoreproject.bean.response.order.OrderResponse;
 import com.example.greenstoreproject.bean.response.orderItem.OrderItemResponse;
+import com.example.greenstoreproject.bean.response.productImage.ProductImageResponse;
 import com.example.greenstoreproject.entity.OrderItems;
 import com.example.greenstoreproject.entity.Orders;
+import com.example.greenstoreproject.entity.ProductImages;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
 public class OrderMapper {
-    public OrderResponse convertToResponse(Orders order) {
-        OrderResponse orderResponseDTO = new OrderResponse();
-        orderResponseDTO.setOrderId(order.getOrderId());
-        orderResponseDTO.setCustomerId(order.getCustomer().getCustomerId());
-        orderResponseDTO.setOrderDate(order.getOrderDate());
-        orderResponseDTO.setDiscount(order.getDiscount());
-        orderResponseDTO.setTotalAmount(order.getTotalAmount());
-        orderResponseDTO.setStatus(order.getStatus());
-        orderResponseDTO.setLatitude(order.getLatitude());
-        orderResponseDTO.setLongitude(order.getLongitude());
-        orderResponseDTO.setShippingAddress(order.getShippingAddress());
+    public OrderResponse toOrderResponse(Orders order) {
+        if (order == null) {
+            return null;
+        }
 
-        List<OrderItemResponse> orderItems = order.getOrderItems().stream().map(orderItem -> {
-            OrderItemResponse orderItemResponseDTO = new OrderItemResponse();
-            orderItemResponseDTO.setOrderItemId(orderItem.getOrderItemId());
-            orderItemResponseDTO.setProductId(orderItem.getProduct().getProductId());
-            orderItemResponseDTO.setQuantity(orderItem.getQuantity());
-            return orderItemResponseDTO;
-        }).collect(Collectors.toList());
+        OrderResponse orderResponse = new OrderResponse();
+        orderResponse.setOrderId(order.getOrderId());
+        orderResponse.setCustomerId(order.getCustomer() != null ? order.getCustomer().getCustomerId() : null);
+        orderResponse.setGuestName(order.getGuestName());
+        orderResponse.setGuestEmail(order.getGuestEmail());
+        orderResponse.setGuestPhone(order.getGuestPhone());
+        orderResponse.setOrderDate(order.getOrderDate());
+        orderResponse.setDiscount(order.getDiscount());
+        orderResponse.setTotalAmount(order.getTotalAmount());
+        orderResponse.setStatus(order.getStatus());
+        orderResponse.setLatitude(order.getLatitude());
+        orderResponse.setLongitude(order.getLongitude());
+        orderResponse.setShippingAddress(order.getShippingAddress());
 
-        orderResponseDTO.setOrderItems(orderItems);
-        return orderResponseDTO;
+
+        return orderResponse;
     }
 
-    public Orders convertToEntity(OrderRequest orderRequest) {
+    public OrderResponse toOrderDetailResponse(Orders order) {
+        if (order == null) {
+            return null;
+        }
+
+        OrderResponse orderResponse = new OrderResponse();
+        orderResponse.setOrderId(order.getOrderId());
+        orderResponse.setCustomerId(order.getCustomer() != null ? order.getCustomer().getCustomerId() : null);
+        orderResponse.setGuestName(order.getGuestName());
+        orderResponse.setGuestEmail(order.getGuestEmail());
+        orderResponse.setGuestPhone(order.getGuestPhone());
+        orderResponse.setOrderDate(order.getOrderDate());
+        orderResponse.setDiscount(order.getDiscount());
+        orderResponse.setTotalAmount(order.getTotalAmount());
+        orderResponse.setStatus(order.getStatus());
+        orderResponse.setLatitude(order.getLatitude());
+        orderResponse.setLongitude(order.getLongitude());
+        orderResponse.setShippingAddress(order.getShippingAddress());
+        orderResponse.setOrderItems(order.getOrderItems().stream()
+                .map(this::toOrderItemResponse)
+                .collect(Collectors.toList()));
+
+        return orderResponse;
+    }
+
+    public Orders toOrder(OrderRequest orderRequest) {
+        if (orderRequest == null) {
+            return null;
+        }
+
         Orders order = new Orders();
-        order.setStatus(orderRequest.getStatus());
+        order.setGuestName(orderRequest.getGuestName());
+        order.setGuestEmail(orderRequest.getGuestEmail());
+        order.setGuestPhone(orderRequest.getGuestPhone());
+        order.setOrderDate(orderRequest.getOrderDate());
+        order.setDiscount(orderRequest.getDiscount());
         order.setTotalAmount(orderRequest.getTotalAmount());
+        order.setStatus(orderRequest.getStatus());
+        order.setLatitude(orderRequest.getLatitude());
+        order.setLongitude(orderRequest.getLongitude());
+        order.setShippingAddress(orderRequest.getShippingAddress());
+        order.setOrderItems(orderRequest.getOrderItems().stream()
+                .map(this::toOrderItem)
+                .collect(Collectors.toList()));
 
         return order;
     }
 
+    public OrderItemResponse toOrderItemResponse(OrderItems orderItem) {
+        if (orderItem == null) {
+            return null;
+        }
 
+        OrderItemResponse orderItemResponse = new OrderItemResponse();
+        orderItemResponse.setOrderItemId(orderItem.getOrderItemId());
+        orderItemResponse.setProductId(orderItem.getProduct().getProductId());
+        orderItemResponse.setProductName(orderItem.getProduct().getProductName());
+        orderItemResponse.setQuantity(orderItem.getQuantity());
+        orderItemResponse.setPrice(orderItem.getProduct().getPrice());
+        orderItemResponse.setProductImages(mapToProductImageResponses(orderItem.getProduct().getProductImages()));
+
+        return orderItemResponse;
+    }
+
+    public OrderItems toOrderItem(OrderItemRequest orderItemRequest) {
+        if (orderItemRequest == null) {
+            return null;
+        }
+
+        OrderItems orderItem = new OrderItems();
+        orderItem.setQuantity(orderItemRequest.getQuantity());
+
+        return orderItem;
+    }
+
+    private List<ProductImageResponse> mapToProductImageResponses(List<ProductImages> productImages) {
+        List<ProductImageResponse> productImageResponses = new ArrayList<>();
+        if (productImages != null && !productImages.isEmpty()) {
+            ProductImages firstProductImage = productImages.get(0);
+            ProductImageResponse productImageResponse = new ProductImageResponse();
+            productImageResponse.setProductImageId(firstProductImage.getProductImageId());
+            productImageResponse.setImageUrl(firstProductImage.getImageUrl());
+            productImageResponses.add(productImageResponse);
+        }
+        return productImageResponses;
+    }
 }

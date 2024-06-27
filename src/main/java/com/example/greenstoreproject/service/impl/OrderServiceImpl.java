@@ -2,95 +2,115 @@ package com.example.greenstoreproject.service.impl;
 
 import com.example.greenstoreproject.bean.request.order.OrderRequest;
 import com.example.greenstoreproject.bean.response.order.OrderResponse;
+import com.example.greenstoreproject.entity.Customers;
 import com.example.greenstoreproject.entity.OrderItems;
 import com.example.greenstoreproject.entity.Orders;
+import com.example.greenstoreproject.entity.Products;
 import com.example.greenstoreproject.mapper.OrderMapper;
-import com.example.greenstoreproject.repository.CartRepository;
-import com.example.greenstoreproject.repository.CustomerRepository;
-import com.example.greenstoreproject.repository.OrderItemRepository;
-import com.example.greenstoreproject.repository.OrderRepository;
+import com.example.greenstoreproject.repository.*;
 import com.example.greenstoreproject.service.OrderService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final CustomerRepository customerRepository;
-    private final CartRepository cartRepository;
-    private final OrderItemRepository orderItemRepository;
+    private final ProductRepository productRepository;
     private final OrderMapper orderMapper;
 
     @Override
     public OrderResponse createOrder(OrderRequest orderRequest) {
-        Orders orders = new Orders();
-        orders.setCustomer(customerRepository.findById(orderRequest.getCustomerId())
-                .orElseThrow(()-> new RuntimeException("Customer not found")));
 
+        Customers customer;
 
+        if (orderRequest.getCustomerId() != null && orderRequest.getCustomerId() > 0) {
+            log.info("Customer ID provided: {}", orderRequest.getCustomerId());
 
-        orders.setOrderDate(orderRequest.getOrderDate());
-        orders.setDiscount(orderRequest.getDiscount());
-        orders.setTotalAmount(orderRequest.getTotalAmount());
-        orders.setStatus(orderRequest.getStatus());
-        orders.setLatitude(orderRequest.getLatitude());
-        orders.setLongitude(orderRequest.getLongitude());
-        orders.setShippingAddress(orderRequest.getShippingAddress());
+            customer = customerRepository.findById(orderRequest.getCustomerId())
+                    .orElseThrow(() -> new RuntimeException("Customer not found"));
+        } else {
+            log.info("No customer ID provided, creating new customer.");
 
-        List<OrderItems> orderItems = cartRepository.findById(orderRequest.getCartId())
-                .orElseThrow(() -> new RuntimeException("Cart not found"))
-                .getCartItems()
-                .stream()
-                .map(cartItem -> {
-                    OrderItems orderItem = new OrderItems();
-                    orderItem.setOrder(orders);
-                    orderItem.setProduct(cartItem.getProduct());
-                    orderItem.setQuantity(cartItem.getQuantity());
-                    return orderItem;
-                })
-                .collect(Collectors.toList());
+            customer = new Customers();
+            customer.setFirstName(orderRequest.getGuestName());
+            customer.setEmail(orderRequest.getGuestEmail());
+            customer.setPhoneNumber(orderRequest.getGuestPhone());
+            customer.setAddress(orderRequest.getShippingAddress());
+            customer = customerRepository.save(customer);
 
-        orders.setOrderItems(orderItems);
+            log.info("New customer created with ID: {}", customer.getCustomerId());
 
-        Orders savedOrder = orderRepository.save(orders);
+        }
 
-        return orderMapper.convertToResponse(savedOrder);
+        Orders order = orderMapper.toOrder(orderRequest);
+
+        order.setCustomer(customer);
+        List<OrderItems> orderItems = new ArrayList<>();
+        orderRequest.getOrderItems().forEach(item -> {
+            Products product = productRepository.findById(item.getProductId())
+                    .orElseThrow(() -> new RuntimeException("Product not found"));
+            OrderItems orderItem = orderMapper.toOrderItem(item);
+            orderItem.setProduct(product);
+            orderItem.setOrder(order);
+            orderItems.add(orderItem);
+        });
+        order.setOrderItems(orderItems);
+        Orders savedOrder = orderRepository.save(order);
+        return orderMapper.toOrderResponse(savedOrder);
     }
 
     @Override
     public OrderResponse getOrderById(Long orderId) {
-        Orders order = orderRepository.findById(orderId).orElseThrow(() -> new RuntimeException("Order not found"));
-        return orderMapper.convertToResponse(order);
+        Orders order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+        return orderMapper.toOrderDetailResponse(order);
     }
 
     @Override
     public List<OrderResponse> getAllOrders() {
-        return orderRepository.findAll().stream().map(orderMapper::convertToResponse).collect(Collectors.toList());
+        List<Orders> orders = orderRepository.findAll();
+        return orders.stream().map(orderMapper::toOrderResponse).collect(Collectors.toList());
     }
 
     @Override
-    public OrderResponse updateOrder(Long orderId, OrderRequest orderRequestDTO) {
+    public OrderResponse updateOrder(Long orderId, OrderRequest orderRequest) {
         Orders existingOrder = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found"));
-
-        existingOrder.setDiscount(orderRequestDTO.getDiscount());
-        existingOrder.setLatitude(orderRequestDTO.getLatitude());
-        existingOrder.setLongitude(orderRequestDTO.getLongitude());
-        existingOrder.setShippingAddress(orderRequestDTO.getShippingAddress());
-
-        orderItemRepository.deleteByOrder_OrderId(existingOrder.getOrderId());
-
-        Orders updatedOrder = orderRepository.save(existingOrder);
-        return orderMapper.convertToResponse(updatedOrder);
+        Orders updatedOrder = orderMapper.toOrder(orderRequest);
+        updatedOrder.setOrderId(existingOrder.getOrderId());
+        updatedOrder.setCustomer(existingOrder.getCustomer());
+        updatedOrder.getOrderItems().clear();
+        List<OrderItems> orderItems = new ArrayList<>();
+        orderRequest.getOrderItems().forEach(item -> {
+            Products product = productRepository.findById(item.getProductId())
+                    .orElseThrow(() -> new RuntimeException("Product not found"));
+            OrderItems orderItem = orderMapper.toOrderItem(item);
+            orderItem.setProduct(product);
+            orderItem.setOrder(updatedOrder);
+            orderItems.add(orderItem);
+        });
+        updatedOrder.setOrderItems(orderItems);
+        Orders savedOrder = orderRepository.save(updatedOrder);
+        return orderMapper.toOrderResponse(savedOrder);
     }
 
     @Override
     public void deleteOrder(Long orderId) {
-        Orders order = orderRepository.findById(orderId).orElseThrow(() -> new RuntimeException("Order not found"));
+        Orders order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
         orderRepository.delete(order);
     }
+
 }

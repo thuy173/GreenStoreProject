@@ -23,6 +23,4 @@ public class OrderItems {
     @Column(name = "quantity")
     private Double quantity;
 
-
-
 }

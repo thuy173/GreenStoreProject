@@ -15,7 +15,11 @@ public class OrderResponse {
 
     private Long customerId;
 
-    private Long cartId;
+    private String guestName;
+
+    private String guestEmail;
+
+    private String guestPhone;
 
     private LocalDate orderDate;
 
