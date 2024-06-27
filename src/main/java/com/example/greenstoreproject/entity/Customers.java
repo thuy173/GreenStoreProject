@@ -30,8 +30,6 @@ public class Customers {
     @Column(name = "phone_number")
     private String phoneNumber;
 
-    @Column(name = "address")
-    private String address;
 
     @OneToOne(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
     private Carts cart;
@@ -39,4 +37,11 @@ public class Customers {
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Orders> orders = new ArrayList<>();
 
+    @ManyToMany
+    @JoinTable(
+            name = "customer_address",
+            joinColumns = @JoinColumn(name = "customer_id"),
+            inverseJoinColumns = @JoinColumn(name = "address_id")
+    )
+    private List<Address> address = new ArrayList<>();;
 }

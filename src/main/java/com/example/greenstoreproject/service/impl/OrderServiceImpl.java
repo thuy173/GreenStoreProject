@@ -47,7 +47,6 @@ public class OrderServiceImpl implements OrderService {
             customer.setFirstName(orderRequest.getGuestName());
             customer.setEmail(orderRequest.getGuestEmail());
             customer.setPhoneNumber(orderRequest.getGuestPhone());
-            customer.setAddress(orderRequest.getShippingAddress());
             customer = customerRepository.save(customer);
 
             log.info("New customer created with ID: {}", customer.getCustomerId());

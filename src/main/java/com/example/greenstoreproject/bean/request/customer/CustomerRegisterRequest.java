@@ -35,6 +35,5 @@ public class CustomerRegisterRequest {
     @Pattern(regexp = "^\\+?[0-9. ()-]{7,25}$", message = "Phone number is invalid")
     private String phoneNumber;
 
-    @NotBlank(message = "Address is required")
-    private String address;
+
 }

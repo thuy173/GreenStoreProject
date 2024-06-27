@@ -13,7 +13,6 @@ public class AuthMapper {
         user.setEmail(customerRegisterRequest.getEmail());
         user.setPassword(customerRegisterRequest.getPassword());
         user.setPhoneNumber(customerRegisterRequest.getPhoneNumber());
-        user.setAddress(customerRegisterRequest.getAddress());
         return user;
     }
 }
