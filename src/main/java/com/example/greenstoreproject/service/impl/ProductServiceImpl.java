@@ -21,6 +21,7 @@ import com.example.greenstoreproject.repository.ProductImageRepository;
 import com.example.greenstoreproject.repository.ProductRepository;
 import com.example.greenstoreproject.service.ProductService;
 import com.example.greenstoreproject.util.SuccessMessage;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -31,6 +32,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -143,5 +145,31 @@ public class ProductServiceImpl implements ProductService {
                 .orElseThrow(() -> new NotFoundException("Product not found " + id));
         productRepository.delete(products);
         return SuccessMessage.SUCCESS_DELETED.getMessage();
+    }
+
+
+    @Override
+    public String addProductImage(Long productId, MultipartFile imageFile) {
+        Optional<Products> optionalProduct = productRepository.findById(productId);
+        if (optionalProduct.isPresent()) {
+            Products product = optionalProduct.get();
+
+            try {
+                Map uploadResult = cloudinary.uploader().upload(imageFile.getBytes(), ObjectUtils.emptyMap());
+
+                ProductImages productImage = new ProductImages();
+                productImage.setImageUrl(uploadResult.get("url").toString());
+                productImage.setProduct(product);
+
+                product.getProductImages().add(productImage);
+
+                productRepository.save(product);
+                return SuccessMessage.SUCCESS_CREATED.getMessage();
+            } catch (IOException e) {
+                throw new RuntimeException("Failed to upload image", e);
+            }
+        } else {
+            throw new NotFoundException("Product not found with id: " + productId);
+        }
     }
 }

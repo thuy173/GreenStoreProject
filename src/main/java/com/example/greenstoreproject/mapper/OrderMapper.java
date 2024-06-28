@@ -127,10 +127,17 @@ public class OrderMapper {
         orderItemResponse.setOrderItemId(orderItem.getOrderItemId());
         orderItemResponse.setProductId(orderItem.getProduct().getProductId());
         orderItemResponse.setProductName(orderItem.getProduct().getProductName());
+        orderItemResponse.setDescription(orderItem.getProduct().getDescription());
         orderItemResponse.setQuantity(orderItem.getQuantity());
         orderItemResponse.setPrice(orderItem.getProduct().getPrice());
         orderItemResponse.setProductImages(mapToProductImageResponses(orderItem.getProduct().getProductImages()));
 
+
+        if (orderItem.getQuantity() != null && orderItem.getQuantity() > 0) {
+            orderItemResponse.setTotalPrice(orderItem.getQuantity() * orderItem.getProduct().getPrice());
+        } else {
+            orderItemResponse.setTotalPrice(0.0);
+        }
         return orderItemResponse;
     }
 
