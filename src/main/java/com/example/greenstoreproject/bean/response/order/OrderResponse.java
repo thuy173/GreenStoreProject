@@ -6,6 +6,7 @@ import com.example.greenstoreproject.entity.OrderStatus;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -21,7 +22,7 @@ public class OrderResponse {
 
     private String guestPhone;
 
-    private LocalDate orderDate;
+    private LocalDateTime orderDate;
 
     private Double discount;
 

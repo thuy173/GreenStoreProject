@@ -1,18 +1,18 @@
 package com.example.greenstoreproject.mapper;
 
 import com.example.greenstoreproject.bean.request.address.AddressRequest;
-import com.example.greenstoreproject.bean.request.category.CategoryRequest;
 import com.example.greenstoreproject.bean.response.address.AddressResponse;
 import com.example.greenstoreproject.entity.Address;
-import com.example.greenstoreproject.entity.Categories;
 import org.springframework.stereotype.Component;
 
 @Component
 public class AddressMapper {
     public static AddressResponse convertToResponse(Address entity) {
         AddressResponse response = new AddressResponse();
+        response.setAddressId(entity.getAddressId());
         response.setAddress(buildAddressString(entity));
         response.setAddressDetail(entity.getAddressDetail());
+        response.setIsActive(entity.getIsActive());
         return response;
     }
 
@@ -21,6 +21,7 @@ public class AddressMapper {
         entity.setProvince(request.getProvince());
         entity.setDistrict(request.getDistrict());
         entity.setWard(request.getWard());
+        entity.setIsActive(request.getIsActive());
         entity.setAddressDetail(request.getAddressDetail());
         return entity;
     }
@@ -29,6 +30,7 @@ public class AddressMapper {
         address.setProvince(addressRequest.getProvince());
         address.setDistrict(addressRequest.getDistrict());
         address.setWard(addressRequest.getWard());
+        address.setIsActive(addressRequest.getIsActive());
         address.setAddressDetail(addressRequest.getAddressDetail());
 
     }

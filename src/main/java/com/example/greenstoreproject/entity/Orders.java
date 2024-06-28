@@ -4,8 +4,10 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @Data
@@ -30,7 +32,7 @@ public class Orders {
     private String guestPhone;
 
     @Column(name = "order_date")
-    private LocalDate orderDate;
+    private LocalDateTime orderDate;
 
     @Column(name = "discount")
     private Double discount;
@@ -53,4 +55,20 @@ public class Orders {
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItems> orderItems = new ArrayList<>();
+
+
+    public void setDefaultShippingAddress() {
+        if (customer != null) {
+            List<Address> activeAddresses = customer.getAddress().stream()
+                    .filter(address -> Boolean.TRUE.equals(address.getIsActive()))
+                    .collect(Collectors.toList());
+
+            if (!activeAddresses.isEmpty()) {
+                Address defaultAddress = activeAddresses.get(0);
+                this.shippingAddress = defaultAddress.getAddressDetail() + ", " +
+                        defaultAddress.getWard() + ", " + defaultAddress.getDistrict()
+                        + ", " + defaultAddress.getProvince();
+            }
+        }
+    }
 }

@@ -5,10 +5,14 @@ import com.example.greenstoreproject.bean.request.orderItem.OrderItemRequest;
 import com.example.greenstoreproject.bean.response.order.OrderResponse;
 import com.example.greenstoreproject.bean.response.orderItem.OrderItemResponse;
 import com.example.greenstoreproject.bean.response.productImage.ProductImageResponse;
+import com.example.greenstoreproject.entity.Customers;
 import com.example.greenstoreproject.entity.OrderItems;
 import com.example.greenstoreproject.entity.Orders;
 import com.example.greenstoreproject.entity.ProductImages;
+import com.example.greenstoreproject.repository.CustomerRepository;
+import com.example.greenstoreproject.service.GeoCodingService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -18,6 +22,13 @@ import java.util.stream.Collectors;
 @Component
 @RequiredArgsConstructor
 public class OrderMapper {
+
+    @Autowired
+    private CustomerRepository customersRepository;
+
+    @Autowired
+    private GeoCodingService geoCodingService;
+
     public OrderResponse toOrderResponse(Orders order) {
         if (order == null) {
             return null;
@@ -86,7 +97,25 @@ public class OrderMapper {
                 .map(this::toOrderItem)
                 .collect(Collectors.toList()));
 
+        if (orderRequest.getCustomerId() != null) {
+            Customers customer = findCustomerById(orderRequest.getCustomerId());
+            order.setCustomer(customer);
+
+            if (customer != null) {
+                order.setDefaultShippingAddress();
+            }
+        }
+
+        if (orderRequest.getLatitude() != 0 && orderRequest.getLongitude() != 0) {
+            String address = geoCodingService.getAddressFromCoordinates(orderRequest.getLatitude(), orderRequest.getLongitude());
+            order.setShippingAddress(address);
+        }
+
         return order;
+    }
+
+    private Customers findCustomerById(Long customerId) {
+        return customersRepository.findById(customerId).orElse(null);
     }
 
     public OrderItemResponse toOrderItemResponse(OrderItems orderItem) {

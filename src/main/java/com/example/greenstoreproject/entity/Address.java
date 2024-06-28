@@ -27,6 +27,9 @@ public class Address {
     @Column(name = "address_detail")
     private String addressDetail;
 
+    @Column(name = "is_active")
+    private Boolean isActive;
+
     @ManyToMany(mappedBy = "address")
     private List<Customers> customer = new ArrayList<>();
 

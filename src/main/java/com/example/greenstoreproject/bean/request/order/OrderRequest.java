@@ -8,6 +8,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,7 +23,7 @@ public class OrderRequest {
 
     private String guestPhone;
 
-    private LocalDate orderDate;
+    private LocalDateTime orderDate;
 
     private Double discount;
 
