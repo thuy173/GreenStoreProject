@@ -78,6 +78,26 @@ public class AddressServiceImpl implements AddressService {
     }
 
     @Override
+    public String updateAddressIsActive(Long customerId, Long addressId, Boolean isActive) {
+        List<Address> addresses = addressRepository.findByCustomerId(customerId);
+
+        if (isActive) {
+            for (Address address : addresses) {
+                if (address.getAddressId() != addressId && address.getIsActive()) {
+                    address.setIsActive(false);
+                    addressRepository.save(address);
+                }
+            }
+        }
+
+        Address addressToUpdate = addressRepository.findById(addressId)
+                .orElseThrow(() -> new RuntimeException("Address not found"));
+        addressToUpdate.setIsActive(isActive);
+        addressRepository.save(addressToUpdate);
+        return SuccessMessage.SUCCESS_UPDATED.getMessage();
+    }
+
+    @Override
     public String deleteAddress(Long id) {
         Customers currentUser = getCurrentUser();
         Address address = addressRepository.findById(id)

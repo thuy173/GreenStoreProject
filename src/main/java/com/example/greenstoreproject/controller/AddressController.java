@@ -5,6 +5,7 @@ import com.example.greenstoreproject.bean.request.category.CategoryRequest;
 import com.example.greenstoreproject.bean.response.address.AddressResponse;
 import com.example.greenstoreproject.bean.response.category.CategoryDetailResponse;
 import com.example.greenstoreproject.bean.response.category.CategoryResponse;
+import com.example.greenstoreproject.entity.Address;
 import com.example.greenstoreproject.service.AddressService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
@@ -39,6 +40,15 @@ public class AddressController {
     @PutMapping("/{id}")
     public String updateAddress(@PathVariable Long id, @Valid @RequestBody AddressRequest addressRequest) {
         return addressService.updateAddress(id, addressRequest);
+    }
+
+    @PutMapping("/{customerId}/{addressId}/active")
+    public String updateAddressIsActive(
+
+            @PathVariable Long customerId,
+            @PathVariable Long addressId,
+            @RequestParam Boolean isActive) {
+        return addressService.updateAddressIsActive(customerId, addressId, isActive);
     }
 
     @DeleteMapping("/{id}")
