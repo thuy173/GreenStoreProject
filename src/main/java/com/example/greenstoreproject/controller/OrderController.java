@@ -42,7 +42,7 @@ public class OrderController {
     @PutMapping("/{orderId}/status")
     public OrderResponse updateOrderStatus(
             @PathVariable Long orderId,
-            @RequestBody OrderStatus status) {
+            @RequestParam("status") OrderStatus status) {
         boolean isAdmin = authService.isAdmin();
         return orderService.updateOrderStatus(orderId, status, isAdmin);
     }
