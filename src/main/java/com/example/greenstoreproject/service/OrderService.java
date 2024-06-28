@@ -2,6 +2,7 @@ package com.example.greenstoreproject.service;
 
 import com.example.greenstoreproject.bean.request.order.OrderRequest;
 import com.example.greenstoreproject.bean.response.order.OrderResponse;
+import com.example.greenstoreproject.entity.OrderStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,4 +18,6 @@ public interface OrderService {
     OrderResponse updateOrder(Long orderId, OrderRequest orderRequestDTO);
 
     void deleteOrder(Long orderId);
+
+    OrderResponse updateOrderStatus(Long orderId, OrderStatus status, boolean isAdmin);
 }

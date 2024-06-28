@@ -2,10 +2,7 @@ package com.example.greenstoreproject.service.impl;
 
 import com.example.greenstoreproject.bean.request.order.OrderRequest;
 import com.example.greenstoreproject.bean.response.order.OrderResponse;
-import com.example.greenstoreproject.entity.Customers;
-import com.example.greenstoreproject.entity.OrderItems;
-import com.example.greenstoreproject.entity.Orders;
-import com.example.greenstoreproject.entity.Products;
+import com.example.greenstoreproject.entity.*;
 import com.example.greenstoreproject.mapper.OrderMapper;
 import com.example.greenstoreproject.repository.*;
 import com.example.greenstoreproject.service.OrderService;
@@ -60,6 +57,12 @@ public class OrderServiceImpl implements OrderService {
             orderItem.setProduct(product);
             orderItem.setOrder(order);
             orderItems.add(orderItem);
+
+            if (product.getQuantityInStock() < item.getQuantity()) {
+                throw new RuntimeException("Not enough stock for product: " + product.getProductName());
+            }
+            product.setQuantityInStock(product.getQuantityInStock() - item.getQuantity());
+            productRepository.save(product);
         });
         order.setOrderItems(orderItems);
         Orders savedOrder = orderRepository.save(order);
@@ -106,6 +109,29 @@ public class OrderServiceImpl implements OrderService {
         Orders order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found"));
         orderRepository.delete(order);
+    }
+
+    @Override
+    public OrderResponse updateOrderStatus(Long orderId, OrderStatus status, boolean isAdmin) {
+        Orders order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+
+        if (!isAdmin && (status == OrderStatus.PROCESSING || status == OrderStatus.SHIPPED || status == OrderStatus.DELIVERED)) {
+            throw new RuntimeException("Permission denied: Only Admin can update to this status.");
+        }
+
+        order.setStatus(status);
+
+        if (status == OrderStatus.CANCELED) {
+            order.getOrderItems().forEach(orderItem -> {
+                Products product = orderItem.getProduct();
+                product.setQuantityInStock(product.getQuantityInStock() + orderItem.getQuantity());
+                productRepository.save(product);
+            });
+        }
+
+        Orders savedOrder = orderRepository.save(order);
+        return orderMapper.toOrderResponse(savedOrder);
     }
 
 }

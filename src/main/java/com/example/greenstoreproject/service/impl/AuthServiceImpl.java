@@ -5,6 +5,7 @@ import com.example.greenstoreproject.repository.CustomerRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -37,5 +38,10 @@ public class AuthServiceImpl implements UserDetailsService {
     public Long getCustomerIdByEmail(String email) {
         Customers customer = customerRepository.findByEmail(email);
         return customer != null ? customer.getCustomerId() : null;
+    }
+
+    public boolean isAdmin() {
+        return SecurityContextHolder.getContext().getAuthentication().getAuthorities()
+                .stream().anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"));
     }
 }
