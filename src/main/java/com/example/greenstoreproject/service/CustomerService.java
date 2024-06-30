@@ -22,4 +22,6 @@ public interface CustomerService {
     String updateCustomer(Long id, CustomerUpdateRequest customerUpdateRequest);
 
     String deleteCustomer(Long id);
+
+    Customers findByEmail(String email);
 }

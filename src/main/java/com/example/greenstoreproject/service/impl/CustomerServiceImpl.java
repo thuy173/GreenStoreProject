@@ -3,13 +3,11 @@ package com.example.greenstoreproject.service.impl;
 import com.example.greenstoreproject.bean.request.customer.CustomerRegisterRequest;
 import com.example.greenstoreproject.bean.request.customer.CustomerUpdateRequest;
 import com.example.greenstoreproject.bean.response.customer.CustomerResponse;
-import com.example.greenstoreproject.entity.Categories;
 import com.example.greenstoreproject.entity.Customers;
 import com.example.greenstoreproject.exception.EmailAlreadyExistsException;
 import com.example.greenstoreproject.exception.EmptyException;
 import com.example.greenstoreproject.exception.NotFoundException;
 import com.example.greenstoreproject.mapper.AuthMapper;
-import com.example.greenstoreproject.mapper.CategoryMapper;
 import com.example.greenstoreproject.mapper.CustomerMapper;
 import com.example.greenstoreproject.repository.CustomerRepository;
 import com.example.greenstoreproject.service.CustomerService;
@@ -36,6 +34,11 @@ public class CustomerServiceImpl implements CustomerService {
         Customers newUser = AuthMapper.convertToCustomerEntity(customerRegisterRequest);
 
         return customerRepository.save(newUser);
+    }
+
+    @Override
+    public Customers findByEmail(String email) {
+        return customerRepository.findByEmail(email);
     }
 
     @Override

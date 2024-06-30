@@ -2,14 +2,14 @@ package com.example.greenstoreproject.controller;
 
 import com.example.greenstoreproject.bean.request.customer.CustomerRegisterRequest;
 import com.example.greenstoreproject.entity.Customers;
-import com.example.greenstoreproject.mapper.AuthMapper;
-import com.example.greenstoreproject.repository.CustomerRepository;
 import com.example.greenstoreproject.service.CartService;
+import com.example.greenstoreproject.service.GoogleTokenVerifier;
 import com.example.greenstoreproject.service.impl.AuthServiceImpl;
 import com.example.greenstoreproject.service.impl.CustomerServiceImpl;
 import com.example.greenstoreproject.util.JwtUtil;
 import com.example.greenstoreproject.bean.request.customer.CustomerLoginRequest;
 
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -17,12 +17,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.WebUtils;
+
+import java.util.UUID;
 
 
 @RestController
@@ -34,6 +32,8 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final CustomerServiceImpl customerService;
     private final CartService cartService;
+    private final GoogleTokenVerifier googleTokenVerifier;
+
 
     @PostMapping("/register")
     public String register(@Valid @RequestBody CustomerRegisterRequest customerRegisterRequest){
@@ -58,6 +58,32 @@ public class AuthController {
         final String jwt = jwtUtil.generateToken(userDetails, customerId);
         return jwt;
     }
+
+    @PostMapping(value = "/google-login")
+    public String googleLogin(@RequestBody String googleToken) {
+        try {
+            GoogleIdToken.Payload payload = googleTokenVerifier.verify(googleToken).getPayload();
+            String email = payload.getEmail();
+            String name = (String) payload.get("name");
+            Customers customer = customerService.findByEmail(email);
+            if (customer == null) {
+                CustomerRegisterRequest registerRequest = new CustomerRegisterRequest();
+                registerRequest.setEmail(email);
+                registerRequest.setFirstName(name);
+                registerRequest.setPassword(UUID.randomUUID().toString());
+                customer = customerService.createUser(registerRequest);
+            }
+            final UserDetails userDetails = userService.loadUserByUsername(email);
+            final Long customerId = userService.getCustomerIdByEmail(email);
+            final String jwt = jwtUtil.generateToken(userDetails, customerId);
+            return jwt;
+        } catch (Exception e) {
+            return "Google login failed";
+        }
+    }
+
+
+
 
     private String getCartUuidFromRequest(HttpServletRequest request) {
         String cartUuid = request.getHeader("X-CART_UUID");
