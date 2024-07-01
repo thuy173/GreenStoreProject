@@ -6,10 +6,6 @@ import com.example.greenstoreproject.entity.Customers;
 import com.example.greenstoreproject.entity.Orders;
 import com.example.greenstoreproject.entity.Products;
 import com.example.greenstoreproject.entity.Rating;
-import com.example.greenstoreproject.service.CustomerService;
-import com.example.greenstoreproject.service.ProductService;
-import com.example.greenstoreproject.service.RatingService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
