@@ -1,6 +1,7 @@
 package com.example.greenstoreproject.controller;
 
 import com.example.greenstoreproject.bean.request.customer.CustomerRegisterRequest;
+import com.example.greenstoreproject.bean.request.google.GoogleTokenRequest;
 import com.example.greenstoreproject.entity.Customers;
 import com.example.greenstoreproject.service.CartService;
 import com.example.greenstoreproject.service.GoogleTokenVerifier;
@@ -60,29 +61,37 @@ public class AuthController {
     }
 
     @PostMapping(value = "/google-login")
-    public String googleLogin(@RequestBody String googleToken) {
+    public String googleLogin(@RequestBody GoogleTokenRequest googleToken, HttpServletRequest request) {
         try {
-            GoogleIdToken.Payload payload = googleTokenVerifier.verify(googleToken).getPayload();
+            GoogleIdToken.Payload payload = googleTokenVerifier.verify(googleToken.getGoogleToken()).getPayload();
             String email = payload.getEmail();
             String name = (String) payload.get("name");
+
+            String[] nameParts = name.split(" ", 2);
+            String firstName = nameParts.length > 0 ? nameParts[0] : "";
+            String lastName = nameParts.length > 1 ? nameParts[1] : "";
+
             Customers customer = customerService.findByEmail(email);
             if (customer == null) {
                 CustomerRegisterRequest registerRequest = new CustomerRegisterRequest();
                 registerRequest.setEmail(email);
-                registerRequest.setFirstName(name);
-                registerRequest.setPassword(UUID.randomUUID().toString());
+                registerRequest.setFirstName(firstName);
+                registerRequest.setLastName(lastName);
                 customer = customerService.createUser(registerRequest);
             }
             final UserDetails userDetails = userService.loadUserByUsername(email);
             final Long customerId = userService.getCustomerIdByEmail(email);
+
+            String cartUuid = getCartUuidFromRequest(request);
+            cartService.mergeCartUponLogin(customerId, cartUuid);
+
             final String jwt = jwtUtil.generateToken(userDetails, customerId);
             return jwt;
         } catch (Exception e) {
+            e.fillInStackTrace();
             return "Google login failed";
         }
     }
-
-
 
 
     private String getCartUuidFromRequest(HttpServletRequest request) {
