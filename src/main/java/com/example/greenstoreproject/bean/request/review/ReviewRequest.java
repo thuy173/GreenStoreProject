@@ -17,4 +17,6 @@ public class ReviewRequest {
     private Long productId;
 
     private Long customerId;
+
+    private Long orderId;
 }

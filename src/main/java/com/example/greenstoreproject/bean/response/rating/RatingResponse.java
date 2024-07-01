@@ -10,4 +10,7 @@ public class RatingResponse {
     private Long ratingId;
     private Integer ratingValue;
     private LocalDateTime createAt;
+    private Long productId;
+    private Long customerId;
+    private Long orderId;
 }

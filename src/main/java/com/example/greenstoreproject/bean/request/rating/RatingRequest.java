@@ -14,4 +14,6 @@ public class RatingRequest {
     private Long productId;
 
     private Long customerId;
+
+    private Long orderId;
 }

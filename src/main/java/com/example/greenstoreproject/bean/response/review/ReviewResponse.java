@@ -9,4 +9,7 @@ public class ReviewResponse {
     private Long reviewId;
     private String content;
     private LocalDateTime createAt;
+    private Long productId;
+    private Long customerId;
+    private Long orderId;
 }
