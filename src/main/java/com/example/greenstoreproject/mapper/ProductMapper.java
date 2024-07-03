@@ -6,9 +6,12 @@ import com.example.greenstoreproject.bean.response.nutrient.NutrientResponse;
 import com.example.greenstoreproject.bean.response.product.ProductDetailResponse;
 import com.example.greenstoreproject.bean.response.product.ProductResponse;
 import com.example.greenstoreproject.bean.response.productImage.ProductImageResponse;
+import com.example.greenstoreproject.bean.response.rating.RatingResponse;
+import com.example.greenstoreproject.bean.response.review.ReviewResponse;
 import com.example.greenstoreproject.entity.*;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,6 +32,22 @@ public class ProductMapper {
         return dto;
     }
 
+    private RatingResponse convertToRatingResponse(Rating rating) {
+        RatingResponse ratingResponse = new RatingResponse();
+        ratingResponse.setRatingId(rating.getRatingId());
+        ratingResponse.setRatingValue(rating.getRatingValue());
+        ratingResponse.setCreateAt(rating.getCreateAt());
+        return ratingResponse;
+    }
+
+    private ReviewResponse convertToReviewResponse(Review review) {
+        ReviewResponse reviewResponse = new ReviewResponse();
+        reviewResponse.setReviewId(review.getReviewId());
+        reviewResponse.setContent(review.getContent());
+        reviewResponse.setCreateAt(review.getCreateAt());
+        return reviewResponse;
+    }
+
     public ProductResponse convertToProductResponse(Products products) {
         ProductResponse productResponse = new ProductResponse();
         productResponse.setProductId(products.getProductId());
@@ -36,9 +55,20 @@ public class ProductMapper {
         productResponse.setPrice(products.getPrice());
         productResponse.setDescription(products.getDescription());
 
-        productResponse.setProductImages(products.getProductImages()
-                .stream().map(this::convertToProductImageDTO)
-                .collect(Collectors.toList()));
+        UnitOfMeasure unitOfMeasure = products.getUnitOfMeasure();
+        if (unitOfMeasure != null) {
+            productResponse.setUnitOfMeasure(unitOfMeasure.name());
+        } else {
+            productResponse.setUnitOfMeasure(null);
+        }
+
+        List<ProductImages> productImages = products.getProductImages();
+        if (!productImages.isEmpty()) {
+            ProductImageResponse imageResponse = convertToProductImageDTO(productImages.get(0));
+            productResponse.setProductImages(Collections.singletonList(imageResponse));
+        } else {
+            productResponse.setProductImages(Collections.emptyList());
+        }
 
         return productResponse;
     }
@@ -52,6 +82,22 @@ public class ProductMapper {
         productResponse.setDescription(product.getDescription());
         productResponse.setManufactureDate(product.getManufactureDate());
         productResponse.setExpiryDate(product.getExpiryDate());
+
+        Double averageRating = product.getRatings().stream()
+                .mapToDouble(Rating::getRatingValue)
+                .average()
+                .orElse(0.0);
+        productResponse.setRating(averageRating);
+
+        List<RatingResponse> ratingResponses = product.getRatings().stream()
+                .map(this::convertToRatingResponse)
+                .collect(Collectors.toList());
+        productResponse.setRatingList(ratingResponses);
+
+        List<ReviewResponse> reviewResponses = product.getReviews().stream()
+                .map(this::convertToReviewResponse)
+                .collect(Collectors.toList());
+        productResponse.setReview(reviewResponses);
 
         productResponse.setNutrients(product.getNutrients()
                 .stream().map(this::convertToNutrientDTO).collect(Collectors.toList()));

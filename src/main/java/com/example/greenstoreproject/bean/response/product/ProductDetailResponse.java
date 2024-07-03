@@ -2,6 +2,8 @@ package com.example.greenstoreproject.bean.response.product;
 
 import com.example.greenstoreproject.bean.response.nutrient.NutrientResponse;
 import com.example.greenstoreproject.bean.response.productImage.ProductImageResponse;
+import com.example.greenstoreproject.bean.response.rating.RatingResponse;
+import com.example.greenstoreproject.bean.response.review.ReviewResponse;
 import lombok.Data;
 
 import java.time.LocalDate;
@@ -31,4 +33,10 @@ public class ProductDetailResponse {
     private List<NutrientResponse> nutrients;
 
     private List<ProductImageResponse> productImages;
+
+    private Double rating;
+
+    private List<RatingResponse> ratingList;
+
+    private List<ReviewResponse> review;
 }

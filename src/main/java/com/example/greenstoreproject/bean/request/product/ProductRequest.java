@@ -26,10 +26,8 @@ public class ProductRequest {
     @Size(max = 700, message = "Description can be up to 700 characters")
     private String description;
 
-    @NotNull(message = "Manufacture date is required")
     private LocalDate manufactureDate;
 
-    @NotNull(message = "Expiry date is required")
     @FutureOrPresent(message = "Expiry date must be in the present or future")
     private LocalDate expiryDate;
 
