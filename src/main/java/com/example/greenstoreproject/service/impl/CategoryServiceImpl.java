@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository categoryRepository;
+    private final CategoryMapper categoryMapper;
 
     @Override
     public List<CategoryResponse> getAllCategory() {
@@ -36,7 +37,7 @@ public class CategoryServiceImpl implements CategoryService {
     public CategoryDetailResponse getCategoryById(Long id) {
         Categories category = categoryRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Category not found " + id));
-        return CategoryMapper.convertToCategoryDetailResponse(category);
+        return categoryMapper.convertToCategoryDetailResponse(category);
     }
 
     @Override
