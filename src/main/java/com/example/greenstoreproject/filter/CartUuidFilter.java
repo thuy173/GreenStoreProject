@@ -4,10 +4,12 @@ import jakarta.servlet.*;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.UUID;
 
+@Component
 public class CartUuidFilter implements Filter {
     private static final String CART_UUID_COOKIE_NAME = "CART_UUID";
 
@@ -23,15 +25,10 @@ public class CartUuidFilter implements Filter {
             Cookie cartUuidCookie = new Cookie(CART_UUID_COOKIE_NAME, cartUuid);
             cartUuidCookie.setPath("/");
             cartUuidCookie.setHttpOnly(false);
-            cartUuidCookie.setSecure(true);
+            cartUuidCookie.setSecure(false);
             cartUuidCookie.setMaxAge(60 * 60 * 24 * 365);
 
-            httpResponse.addHeader("Set-Cookie", String.format("%s=%s; Max-Age=%d; Path=%s; Secure; HttpOnly; SameSite=None",
-                    cartUuidCookie.getName(),
-                    cartUuidCookie.getValue(),
-                    cartUuidCookie.getMaxAge(),
-                    cartUuidCookie.getPath()));
-
+            httpResponse.addCookie(cartUuidCookie);
         }
 
         filterChain.doFilter(servletRequest, servletResponse);
