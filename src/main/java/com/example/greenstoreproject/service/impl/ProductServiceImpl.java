@@ -4,10 +4,8 @@ import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import com.example.greenstoreproject.bean.request.product.ProductRequest;
 import com.example.greenstoreproject.bean.request.product.ProductUpdateRequest;
-import com.example.greenstoreproject.bean.response.nutrient.NutrientResponse;
 import com.example.greenstoreproject.bean.response.product.ProductDetailResponse;
 import com.example.greenstoreproject.bean.response.product.ProductResponse;
-import com.example.greenstoreproject.bean.response.productImage.ProductImageResponse;
 import com.example.greenstoreproject.entity.Categories;
 import com.example.greenstoreproject.entity.Nutrients;
 import com.example.greenstoreproject.entity.ProductImages;
@@ -15,21 +13,15 @@ import com.example.greenstoreproject.entity.Products;
 import com.example.greenstoreproject.exception.EmptyException;
 import com.example.greenstoreproject.exception.NotFoundException;
 import com.example.greenstoreproject.mapper.ProductMapper;
-import com.example.greenstoreproject.repository.CategoryRepository;
-import com.example.greenstoreproject.repository.NutrientRepository;
-import com.example.greenstoreproject.repository.ProductImageRepository;
-import com.example.greenstoreproject.repository.ProductRepository;
+import com.example.greenstoreproject.repository.*;
 import com.example.greenstoreproject.service.ProductService;
 import com.example.greenstoreproject.util.SuccessMessage;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -41,15 +33,14 @@ public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
     private final NutrientRepository nutrientRepository;
-    private final ProductImageRepository productImageRepository;
     private final ProductMapper productMapper;
     private final Cloudinary cloudinary;
-
+    private final CartItemRepository cartItemRepository;
 
 
     @Override
     public List<ProductResponse> getAllProduct() {
-        List<Products> products = productRepository.findAll();
+        List<Products> products = productRepository.findActiveProducts();
         if(products.isEmpty()){
             throw new EmptyException("Product list is Empty");
         }
@@ -140,15 +131,6 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public String deleteProduct(Long id) {
-        Products products = productRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Product not found " + id));
-        productRepository.delete(products);
-        return SuccessMessage.SUCCESS_DELETED.getMessage();
-    }
-
-
-    @Override
     public String addProductImage(Long productId, MultipartFile imageFile) {
         Optional<Products> optionalProduct = productRepository.findById(productId);
         if (optionalProduct.isPresent()) {
@@ -170,6 +152,32 @@ public class ProductServiceImpl implements ProductService {
             }
         } else {
             throw new NotFoundException("Product not found with id: " + productId);
+        }
+    }
+
+    @Override
+    @Transactional
+    public void softDeleteProduct(Long productId) {
+        Optional<Products> productOpt = productRepository.findById(productId);
+
+        if (productOpt.isPresent()) {
+            Products product = productOpt.get();
+
+            product.setStatus(2);
+            productRepository.save(product);
+
+            cartItemRepository.deleteByProduct(product);
+        }
+    }
+
+    @Override
+    public void activateProduct(Long productId) {
+        Optional<Products> products = productRepository.findById(productId);
+
+        if(products.isPresent()){
+            Products product = products.get();
+            product.setStatus(1);
+            productRepository.save(product);
         }
     }
 }

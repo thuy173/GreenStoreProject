@@ -25,8 +25,9 @@ public interface ProductService {
 
     String updateProductImage(Long productId, int index, MultipartFile newImage);
 
-    String deleteProduct(Long id);
-
     String addProductImage(Long productId, MultipartFile imageFile);
 
+    void softDeleteProduct(Long productId);
+
+    void activateProduct(Long productId);
 }
