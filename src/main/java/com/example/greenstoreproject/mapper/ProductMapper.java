@@ -54,6 +54,7 @@ public class ProductMapper {
         productResponse.setProductName(products.getProductName());
         productResponse.setPrice(products.getPrice());
         productResponse.setDescription(products.getDescription());
+        productResponse.setStatus(products.getStatus());
 
         UnitOfMeasure unitOfMeasure = products.getUnitOfMeasure();
         if (unitOfMeasure != null) {
@@ -134,6 +135,7 @@ public class ProductMapper {
         products.setCategory(category);
         products.setNutrients(nutrients);
         products.setProductImages(productImages);
+        products.setStatus(1);
 
         for (ProductImages image : productImages) {
             image.setProduct(products);

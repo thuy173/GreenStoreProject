@@ -19,6 +19,8 @@ public class CategoryMapper {
         CategoryResponse categoryResponse = new CategoryResponse();
         categoryResponse.setCategoryId(categories.getCategoryId());
         categoryResponse.setCategoryName(categories.getCategoryName());
+        categoryResponse.setDescription(categories.getDescription());
+        
         return categoryResponse;
     }
 

@@ -19,5 +19,7 @@ public class ProductResponse {
 
     private String unitOfMeasure;
 
+    private Integer status;
+
     private List<ProductImageResponse> productImages;
 }
