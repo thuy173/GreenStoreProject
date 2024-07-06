@@ -39,6 +39,17 @@ public class ProductServiceImpl implements ProductService {
 
 
     @Override
+    public List<ProductResponse> getAllProductStatus() {
+        List<Products> products = productRepository.findAll();
+        if(products.isEmpty()){
+            throw new EmptyException("Product list is Empty");
+        }
+        return products.stream()
+                .map(productMapper::convertToProductResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public List<ProductResponse> getAllProduct() {
         List<Products> products = productRepository.findActiveProducts();
         if(products.isEmpty()){

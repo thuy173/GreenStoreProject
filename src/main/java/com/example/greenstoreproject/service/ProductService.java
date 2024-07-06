@@ -15,6 +15,9 @@ import java.util.Map;
 
 @Service
 public interface ProductService {
+
+    List<ProductResponse> getAllProductStatus();
+
     List<ProductResponse> getAllProduct();
 
     ProductDetailResponse getProductById(Long id);
