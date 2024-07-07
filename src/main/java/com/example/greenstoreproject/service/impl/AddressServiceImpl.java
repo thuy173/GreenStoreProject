@@ -50,10 +50,13 @@ public class AddressServiceImpl implements AddressService {
     public AddressResponse getAddressById(Long id) {
         Customers currentUser = getCurrentUser();
         Address address = addressRepository.findById(id)
-                .filter(a -> a.getCustomer().equals(currentUser))
-                .orElseThrow(() -> new NotFoundException("Address not found or you don't have access to it: " + id));
-        return AddressMapper.convertToResponse(address);
+                .orElseThrow(() -> new NotFoundException("Address not found " + id));
 
+        if (!currentUser.getAddress().contains(address)) {
+            throw new NotFoundException("Address not found or you don't have access to it: " + id);
+        }
+
+        return AddressMapper.convertToResponse(address);
     }
 
     @Override
@@ -69,9 +72,13 @@ public class AddressServiceImpl implements AddressService {
     @Override
     public String updateAddress(Long id, AddressRequest addressRequest) {
         Customers currentUser = getCurrentUser();
+        
         Address address = addressRepository.findById(id)
-                .filter(a -> a.getCustomer().equals(currentUser))
-                .orElseThrow(() -> new NotFoundException("Address not found or you don't have access to it: " + id));
+                .orElseThrow(() -> new NotFoundException("Address not found " + id));
+
+        if (!currentUser.getAddress().contains(address)) {
+            throw new NotFoundException("Address not found or you don't have access to it: " + id);
+        }
         AddressMapper.updateFromRequest(address, addressRequest);
         addressRepository.save(address);
         return SuccessMessage.SUCCESS_UPDATED.getMessage();
@@ -100,9 +107,13 @@ public class AddressServiceImpl implements AddressService {
     @Override
     public String deleteAddress(Long id) {
         Customers currentUser = getCurrentUser();
+
         Address address = addressRepository.findById(id)
-                .filter(a -> a.getCustomer().equals(currentUser))
-                .orElseThrow(() -> new NotFoundException("Address not found or you don't have access to it: " + id));
+                .orElseThrow(() -> new NotFoundException("Address not found " + id));
+
+        if (!currentUser.getAddress().contains(address)) {
+            throw new NotFoundException("Address not found or you don't have access to it: " + id);
+        }
 
         List<Customers> customers = customerRepository.findAll();
         for (Customers customer : customers) {
