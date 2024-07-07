@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 public class CustomerMapper {
     public static CustomerResponse convertToResponse(Customers customers) {
         CustomerResponse customerResponse = new CustomerResponse();
+        customerResponse.setCustomerId(customers.getCustomerId());
         customerResponse.setFullName(customers.getFirstName() + " " + customers.getLastName());
         customerResponse.setEmail(customers.getEmail());
         customerResponse.setPhoneNumber(customers.getPhoneNumber());
@@ -34,6 +35,7 @@ public class CustomerMapper {
         if (customers == null) {
             return customerResponse;
         }
+        customerResponse.setCustomerId(customers.getCustomerId());
         customerResponse.setFullName(customers.getFirstName() + " " + customers.getLastName());
         customerResponse.setEmail(customers.getEmail());
         customerResponse.setPhoneNumber(customers.getPhoneNumber());

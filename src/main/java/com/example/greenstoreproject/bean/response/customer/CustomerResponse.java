@@ -8,6 +8,7 @@ import java.util.List;
 
 @Data
 public class CustomerResponse {
+    private Long customerId;
 
     private String fullName;
 
