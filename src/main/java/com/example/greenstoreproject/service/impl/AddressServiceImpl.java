@@ -50,7 +50,7 @@ public class AddressServiceImpl implements AddressService {
     public AddressResponse getAddressById(Long id) {
         Customers currentUser = getCurrentUser();
         Address address = addressRepository.findById(id)
-//                .filter(a -> a.getCustomer().equals(currentUser))
+                .filter(a -> a.getCustomer().equals(currentUser))
                 .orElseThrow(() -> new NotFoundException("Address not found or you don't have access to it: " + id));
         return AddressMapper.convertToResponse(address);
 
@@ -70,7 +70,7 @@ public class AddressServiceImpl implements AddressService {
     public String updateAddress(Long id, AddressRequest addressRequest) {
         Customers currentUser = getCurrentUser();
         Address address = addressRepository.findById(id)
-//                .filter(a -> a.getCustomer().equals(currentUser))
+                .filter(a -> a.getCustomer().equals(currentUser))
                 .orElseThrow(() -> new NotFoundException("Address not found or you don't have access to it: " + id));
         AddressMapper.updateFromRequest(address, addressRequest);
         addressRepository.save(address);
@@ -101,8 +101,15 @@ public class AddressServiceImpl implements AddressService {
     public String deleteAddress(Long id) {
         Customers currentUser = getCurrentUser();
         Address address = addressRepository.findById(id)
-//                .filter(a -> a.getCustomer().equals(currentUser))
+                .filter(a -> a.getCustomer().equals(currentUser))
                 .orElseThrow(() -> new NotFoundException("Address not found or you don't have access to it: " + id));
+
+        List<Customers> customers = customerRepository.findAll();
+        for (Customers customer : customers) {
+            customer.getAddress().removeIf(addr -> addr.getAddressId().equals(id));
+            customerRepository.save(customer);
+        }
+
         addressRepository.delete(address);
         return SuccessMessage.SUCCESS_DELETED.getMessage();
     }
