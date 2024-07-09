@@ -56,7 +56,7 @@ public class AddressServiceImpl implements AddressService {
             throw new NotFoundException("Address not found or you don't have access to it: " + id);
         }
 
-        return AddressMapper.convertToResponse(address);
+        return AddressMapper.convertToDetailResponse(address);
     }
 
     @Override

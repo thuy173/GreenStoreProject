@@ -16,6 +16,17 @@ public class AddressMapper {
         return response;
     }
 
+    public static AddressResponse convertToDetailResponse(Address entity) {
+        AddressResponse response = new AddressResponse();
+        response.setAddressId(entity.getAddressId());
+        response.setProvince(entity.getProvince());
+        response.setDistrict(entity.getDistrict());
+        response.setWard(entity.getWard());
+        response.setAddressDetail(entity.getAddressDetail());
+        response.setIsActive(entity.getIsActive());
+        return response;
+    }
+
     public static Address convertToEntity(AddressRequest request) {
         Address entity = new Address();
         entity.setProvince(request.getProvince());
