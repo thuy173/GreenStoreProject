@@ -22,6 +22,7 @@ public class OrderServiceImpl implements OrderService {
     private final CustomerRepository customerRepository;
     private final ProductRepository productRepository;
     private final OrderMapper orderMapper;
+    private final CartRepository cartRepository;
 
     @Override
     public OrderResponse createOrder(OrderRequest orderRequest) {
@@ -66,6 +67,18 @@ public class OrderServiceImpl implements OrderService {
         });
         order.setOrderItems(orderItems);
         Orders savedOrder = orderRepository.save(order);
+
+        Carts cart = cartRepository.findByCustomerCustomerId(customer.getCustomerId());
+        if (cart != null) {
+            List<CartItems> cartItemsToRemove = new ArrayList<>();
+            for (OrderItems orderItem : orderItems) {
+                cart.getCartItems().stream()
+                        .filter(cartItem -> cartItem.getProduct().getProductId().equals(orderItem.getProduct().getProductId()))
+                        .forEach(cartItemsToRemove::add);
+            }
+            cart.getCartItems().removeAll(cartItemsToRemove);
+            cartRepository.save(cart);
+        }
         return orderMapper.toOrderResponse(savedOrder);
     }
 

@@ -2,6 +2,7 @@ package com.example.greenstoreproject.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,7 +10,9 @@ import java.util.List;
 @Entity
 @Data
 @Table(name = "customers")
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Customers {
+    @EqualsAndHashCode.Include
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "customer_id")
