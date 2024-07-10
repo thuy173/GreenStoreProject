@@ -13,12 +13,17 @@ import com.example.greenstoreproject.mapper.AuthMapper;
 import com.example.greenstoreproject.mapper.CustomerMapper;
 import com.example.greenstoreproject.repository.CustomerRepository;
 import com.example.greenstoreproject.service.CustomerService;
+import com.example.greenstoreproject.util.JwtUtil;
 import com.example.greenstoreproject.util.SuccessMessage;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,6 +33,8 @@ public class CustomerServiceImpl implements CustomerService {
     private final CustomerRepository customerRepository;
     private final PasswordEncoder passwordEncoder;
     private final Cloudinary cloudinary;
+    private final JwtUtil jwtUtil;
+    private final AuthServiceImpl authServiceImpl;
 
     private static final String DEFAULT_AVATAR_URL = "http://res.cloudinary.com/dmmk9racr/image/upload/v1720583529/z4hzrmjbq1cc3dvz1xjz.png";
 
@@ -68,12 +75,26 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public String updateCustomer(Long id, CustomerUpdateRequest customerUpdateRequest) {
-        Customers customers = customerRepository.findById(id)
+    public Map<String, String> updateCustomer(Long id, CustomerUpdateRequest customerUpdateRequest) {
+        Customers customer = customerRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Customer not found " + id));
-        CustomerMapper.updateFromRequest(customers, customerUpdateRequest);
-        customerRepository.save(customers);
-        return SuccessMessage.SUCCESS_UPDATED.getMessage();
+
+        boolean emailUpdated = !customer.getEmail().equals(customerUpdateRequest.getEmail());
+        CustomerMapper.updateFromRequest(customer, customerUpdateRequest);
+        customerRepository.save(customer);
+
+        Map<String, String> response = new HashMap<>();
+        response.put("message", SuccessMessage.SUCCESS_UPDATED.getMessage());
+
+        if (emailUpdated) {
+            UserDetails userDetails = new org.springframework.security.core.userdetails.User(
+                    customer.getEmail(), customer.getPassword(), List.of(new SimpleGrantedAuthority("ROLE_USER"))
+            );
+            String newToken = jwtUtil.generateToken(userDetails, customer.getCustomerId());
+            response.put("token", newToken);
+        }
+
+        return response;
     }
 
     @Override

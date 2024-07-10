@@ -11,6 +11,7 @@ import com.example.greenstoreproject.entity.Customers;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 public interface CustomerService {
@@ -20,7 +21,7 @@ public interface CustomerService {
 
     CustomerResponse getCustomerById(Long id);
 
-    String updateCustomer(Long id, CustomerUpdateRequest customerUpdateRequest);
+    Map<String, String> updateCustomer(Long id, CustomerUpdateRequest customerUpdateRequest);
 
     String updateAvatar(Long id, CustomerUpdateAvatarRequest customerUpdateRequest);
 

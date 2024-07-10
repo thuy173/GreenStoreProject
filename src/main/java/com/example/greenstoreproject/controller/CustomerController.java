@@ -4,14 +4,18 @@ import com.example.greenstoreproject.bean.request.customer.CustomerUpdateAvatarR
 import com.example.greenstoreproject.bean.request.customer.CustomerUpdateRequest;
 import com.example.greenstoreproject.bean.response.customer.CustomerResponse;
 import com.example.greenstoreproject.service.CustomerService;
+import com.example.greenstoreproject.util.SuccessMessage;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -32,8 +36,9 @@ public class CustomerController {
     }
 
     @PutMapping("/{id}")
-    public String updateCustomer(@PathVariable Long id, @Valid @RequestBody CustomerUpdateRequest customerUpdateRequest) {
-        return customerService.updateCustomer(id, customerUpdateRequest);
+    public ResponseEntity<Map<String, String>> updateCustomer(@PathVariable Long id, @Valid @RequestBody CustomerUpdateRequest customerUpdateRequest) {
+        Map<String, String> result = customerService.updateCustomer(id, customerUpdateRequest);
+        return ResponseEntity.ok(result);
     }
 
     @PutMapping(value = "/{id}/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
