@@ -31,6 +31,7 @@ public class CategoryMapper {
         categoryResponse.setDescription(categories.getDescription());
 
         categoryResponse.setProducts(categories.getProducts().stream()
+                .filter(product -> product.getStatus() == 1)
                 .map(productMapper::convertToProductResponse)
                 .collect(Collectors.toList()));
 
