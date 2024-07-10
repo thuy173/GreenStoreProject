@@ -2,6 +2,7 @@ package com.example.greenstoreproject.service;
 
 import com.example.greenstoreproject.bean.request.category.CategoryRequest;
 import com.example.greenstoreproject.bean.request.customer.CustomerRegisterRequest;
+import com.example.greenstoreproject.bean.request.customer.CustomerUpdateAvatarRequest;
 import com.example.greenstoreproject.bean.request.customer.CustomerUpdateRequest;
 import com.example.greenstoreproject.bean.response.category.CategoryDetailResponse;
 import com.example.greenstoreproject.bean.response.category.CategoryResponse;
@@ -20,6 +21,8 @@ public interface CustomerService {
     CustomerResponse getCustomerById(Long id);
 
     String updateCustomer(Long id, CustomerUpdateRequest customerUpdateRequest);
+
+    String updateAvatar(Long id, CustomerUpdateAvatarRequest customerUpdateRequest);
 
     String deleteCustomer(Long id);
 

@@ -1,17 +1,18 @@
 package com.example.greenstoreproject.mapper;
 
-import com.example.greenstoreproject.bean.request.category.CategoryRequest;
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
+import com.example.greenstoreproject.bean.request.customer.CustomerUpdateAvatarRequest;
 import com.example.greenstoreproject.bean.request.customer.CustomerUpdateRequest;
 import com.example.greenstoreproject.bean.response.address.AddressResponse;
 import com.example.greenstoreproject.bean.response.customer.CustomerResponse;
 import com.example.greenstoreproject.entity.Address;
-import com.example.greenstoreproject.entity.Categories;
 import com.example.greenstoreproject.entity.Customers;
 import org.springframework.stereotype.Component;
 
-import lombok.extern.slf4j.Slf4j;
-
+import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 
@@ -23,6 +24,7 @@ public class CustomerMapper {
         customerResponse.setFullName(customers.getFirstName() + " " + customers.getLastName());
         customerResponse.setEmail(customers.getEmail());
         customerResponse.setPhoneNumber(customers.getPhoneNumber());
+        customerResponse.setAvatar(customers.getAvatar());
         customerResponse.setAddress(convertAddressIsActiveList(customers.getAddress()));
 
         return customerResponse;
@@ -39,6 +41,7 @@ public class CustomerMapper {
         customerResponse.setFullName(customers.getFirstName() + " " + customers.getLastName());
         customerResponse.setEmail(customers.getEmail());
         customerResponse.setPhoneNumber(customers.getPhoneNumber());
+        customerResponse.setAvatar(customers.getAvatar());
         customerResponse.setAddress(convertAddressList(customers.getAddress()));
 
         return customerResponse;
@@ -50,6 +53,16 @@ public class CustomerMapper {
         customers.setEmail(customerUpdateRequest.getEmail());
         customers.setPhoneNumber(customerUpdateRequest.getPhoneNumber());
 
+    }
+
+    public static void updateAvatar(Cloudinary cloudinary, Customers customers, CustomerUpdateAvatarRequest customerUpdateAvatarRequest){
+        try {
+            Map uploadResult = cloudinary.uploader().upload(customerUpdateAvatarRequest.getAvatar().getBytes(), ObjectUtils.emptyMap());
+            String url = uploadResult.get("url").toString();
+            customers.setAvatar(url);
+        } catch (IOException e) {
+            throw new RuntimeException("Avatar upload failed", e);
+        }
     }
 
     private static List<AddressResponse> convertAddressIsActiveList(List<Address> addresses) {

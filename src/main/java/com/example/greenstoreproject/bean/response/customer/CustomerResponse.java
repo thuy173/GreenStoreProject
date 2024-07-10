@@ -16,5 +16,7 @@ public class CustomerResponse {
 
     private String phoneNumber;
 
+    private String avatar;
+
     private List<AddressResponse> address = new ArrayList<>();
 }

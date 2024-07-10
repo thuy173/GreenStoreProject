@@ -53,4 +53,7 @@ public class Customers {
 
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Rating> ratings = new ArrayList<>();
+
+    @Column(name = "avatar")
+    private String avatar;
 }

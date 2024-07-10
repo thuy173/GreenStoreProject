@@ -4,7 +4,6 @@ import com.example.greenstoreproject.bean.request.product.ProductRequest;
 import com.example.greenstoreproject.bean.request.product.ProductUpdateRequest;
 import com.example.greenstoreproject.bean.response.product.ProductDetailResponse;
 import com.example.greenstoreproject.bean.response.product.ProductResponse;
-import com.example.greenstoreproject.entity.Products;
 import com.example.greenstoreproject.service.ProductService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;

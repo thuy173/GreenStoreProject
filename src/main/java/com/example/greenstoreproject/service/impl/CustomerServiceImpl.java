@@ -1,6 +1,8 @@
 package com.example.greenstoreproject.service.impl;
 
+import com.cloudinary.Cloudinary;
 import com.example.greenstoreproject.bean.request.customer.CustomerRegisterRequest;
+import com.example.greenstoreproject.bean.request.customer.CustomerUpdateAvatarRequest;
 import com.example.greenstoreproject.bean.request.customer.CustomerUpdateRequest;
 import com.example.greenstoreproject.bean.response.customer.CustomerResponse;
 import com.example.greenstoreproject.entity.Customers;
@@ -25,6 +27,8 @@ public class CustomerServiceImpl implements CustomerService {
 
     private final CustomerRepository customerRepository;
     private final PasswordEncoder passwordEncoder;
+    private final Cloudinary cloudinary;
+
     @Override
     public Customers createUser(CustomerRegisterRequest customerRegisterRequest) {
         if (customerRepository.existsByEmail(customerRegisterRequest.getEmail())) {
@@ -64,6 +68,16 @@ public class CustomerServiceImpl implements CustomerService {
         Customers customers = customerRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Customer not found " + id));
         CustomerMapper.updateFromRequest(customers, customerUpdateRequest);
+        customerRepository.save(customers);
+        return SuccessMessage.SUCCESS_UPDATED.getMessage();
+    }
+
+    @Override
+    public String updateAvatar(Long id, CustomerUpdateAvatarRequest customerUpdateRequest) {
+        Customers customers = customerRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Customer not found " + id));
+
+        CustomerMapper.updateAvatar(cloudinary, customers, customerUpdateRequest);
         customerRepository.save(customers);
         return SuccessMessage.SUCCESS_UPDATED.getMessage();
     }
