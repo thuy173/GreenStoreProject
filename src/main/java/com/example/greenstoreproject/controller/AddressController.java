@@ -2,6 +2,7 @@ package com.example.greenstoreproject.controller;
 
 import com.example.greenstoreproject.bean.request.address.AddressRequest;
 import com.example.greenstoreproject.bean.request.category.CategoryRequest;
+import com.example.greenstoreproject.bean.response.address.AddressDetailResponse;
 import com.example.greenstoreproject.bean.response.address.AddressResponse;
 import com.example.greenstoreproject.bean.response.category.CategoryDetailResponse;
 import com.example.greenstoreproject.bean.response.category.CategoryResponse;
@@ -28,7 +29,7 @@ public class AddressController {
     }
 
     @GetMapping("/{id}")
-    public AddressResponse getAddressById(@PathVariable Long id) {
+    public AddressDetailResponse getAddressById(@PathVariable Long id) {
         return addressService.getAddressById(id);
     }
 

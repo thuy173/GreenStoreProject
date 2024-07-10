@@ -2,6 +2,7 @@ package com.example.greenstoreproject.service;
 
 import com.example.greenstoreproject.bean.request.address.AddressRequest;
 import com.example.greenstoreproject.bean.request.category.CategoryRequest;
+import com.example.greenstoreproject.bean.response.address.AddressDetailResponse;
 import com.example.greenstoreproject.bean.response.address.AddressResponse;
 import com.example.greenstoreproject.bean.response.category.CategoryDetailResponse;
 import com.example.greenstoreproject.bean.response.category.CategoryResponse;
@@ -14,7 +15,7 @@ import java.util.List;
 public interface AddressService {
     List<AddressResponse> getAllAddress();
 
-    AddressResponse getAddressById(Long id);
+    AddressDetailResponse getAddressById(Long id);
 
     String createAddress(AddressRequest addressRequest);
 

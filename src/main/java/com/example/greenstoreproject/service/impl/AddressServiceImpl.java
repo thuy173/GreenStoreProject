@@ -1,6 +1,7 @@
 package com.example.greenstoreproject.service.impl;
 
 import com.example.greenstoreproject.bean.request.address.AddressRequest;
+import com.example.greenstoreproject.bean.response.address.AddressDetailResponse;
 import com.example.greenstoreproject.bean.response.address.AddressResponse;
 import com.example.greenstoreproject.entity.Address;
 import com.example.greenstoreproject.entity.Customers;
@@ -47,7 +48,7 @@ public class AddressServiceImpl implements AddressService {
     }
 
     @Override
-    public AddressResponse getAddressById(Long id) {
+    public AddressDetailResponse getAddressById(Long id) {
         Customers currentUser = getCurrentUser();
         Address address = addressRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Address not found " + id));
@@ -63,6 +64,14 @@ public class AddressServiceImpl implements AddressService {
     public String createAddress(AddressRequest addressRequest) {
         Customers currentUser = getCurrentUser();
         Address address = AddressMapper.convertToEntity(addressRequest);
+
+        boolean hasActiveAddress = currentUser.getAddress().stream().anyMatch(Address::getIsActive);
+        if (hasActiveAddress) {
+            address.setIsActive(false);
+        } else {
+            address.setIsActive(true);
+        }
+
         address.getCustomer().add(currentUser);
         currentUser.getAddress().add(address);
         addressRepository.save(address);
