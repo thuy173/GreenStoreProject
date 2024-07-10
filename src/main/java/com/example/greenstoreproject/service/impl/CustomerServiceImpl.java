@@ -29,6 +29,8 @@ public class CustomerServiceImpl implements CustomerService {
     private final PasswordEncoder passwordEncoder;
     private final Cloudinary cloudinary;
 
+    private static final String DEFAULT_AVATAR_URL = "http://res.cloudinary.com/dmmk9racr/image/upload/v1720583529/z4hzrmjbq1cc3dvz1xjz.png";
+
     @Override
     public Customers createUser(CustomerRegisterRequest customerRegisterRequest) {
         if (customerRepository.existsByEmail(customerRegisterRequest.getEmail())) {
@@ -36,6 +38,8 @@ public class CustomerServiceImpl implements CustomerService {
         }
         customerRegisterRequest.setPassword(passwordEncoder.encode(customerRegisterRequest.getPassword()));
         Customers newUser = AuthMapper.convertToCustomerEntity(customerRegisterRequest);
+
+        newUser.setAvatar(DEFAULT_AVATAR_URL);
 
         return customerRepository.save(newUser);
     }
