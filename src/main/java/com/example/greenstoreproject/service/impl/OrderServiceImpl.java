@@ -105,7 +105,7 @@ public class OrderServiceImpl implements OrderService {
         Orders order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found"));
 
-        if (!isAdmin && EnumSet.of(OrderStatus.PROCESSING, OrderStatus.SHIPPED, OrderStatus.DELIVERED).contains(status)) {
+        if (!isAdmin && EnumSet.of(OrderStatus.PROCESSING, OrderStatus.SHIPPED, OrderStatus.DELIVERED, OrderStatus.RETURNED).contains(status)) {
             throw new RuntimeException("Permission denied: Only Admin can update to this status.");
         }
 

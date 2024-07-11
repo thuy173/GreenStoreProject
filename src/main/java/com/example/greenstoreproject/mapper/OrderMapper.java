@@ -7,10 +7,7 @@ import com.example.greenstoreproject.bean.response.order.OrderDetailResponse;
 import com.example.greenstoreproject.bean.response.order.OrderResponse;
 import com.example.greenstoreproject.bean.response.orderItem.OrderItemResponse;
 import com.example.greenstoreproject.bean.response.productImage.ProductImageResponse;
-import com.example.greenstoreproject.entity.Customers;
-import com.example.greenstoreproject.entity.OrderItems;
-import com.example.greenstoreproject.entity.Orders;
-import com.example.greenstoreproject.entity.ProductImages;
+import com.example.greenstoreproject.entity.*;
 import com.example.greenstoreproject.repository.CustomerRepository;
 import com.example.greenstoreproject.service.GeoCodingService;
 import lombok.RequiredArgsConstructor;
@@ -39,9 +36,6 @@ public class OrderMapper {
         OrderResponse orderResponse = new OrderResponse();
         orderResponse.setOrderId(order.getOrderId());
         orderResponse.setCustomerId(order.getCustomer() != null ? order.getCustomer().getCustomerId() : null);
-        orderResponse.setGuestName(order.getGuestName());
-        orderResponse.setGuestEmail(order.getGuestEmail());
-        orderResponse.setGuestPhone(order.getGuestPhone());
         orderResponse.setOrderDate(order.getOrderDate());
         orderResponse.setDiscount(order.getDiscount());
         orderResponse.setTotalAmount(order.getTotalAmount());
@@ -49,6 +43,17 @@ public class OrderMapper {
         orderResponse.setLatitude(order.getLatitude());
         orderResponse.setLongitude(order.getLongitude());
         orderResponse.setShippingAddress(order.getShippingAddress());
+
+        if (order.getCustomer() != null) {
+            Customers customer = order.getCustomer();
+            String fullName = customer.getFirstName();
+            if (customer.getLastName() != null) {
+                fullName += " " + customer.getLastName();
+            }
+            orderResponse.setFullName(fullName);
+            orderResponse.setEmail(customer.getEmail());
+            orderResponse.setPhoneNumber(customer.getPhoneNumber());
+        }
 
         return orderResponse;
     }
@@ -81,9 +86,6 @@ public class OrderMapper {
         OrderDetailResponse orderResponse = new OrderDetailResponse();
         orderResponse.setOrderId(order.getOrderId());
         orderResponse.setCustomerId(order.getCustomer() != null ? order.getCustomer().getCustomerId() : null);
-        orderResponse.setGuestName(order.getGuestName());
-        orderResponse.setGuestEmail(order.getGuestEmail());
-        orderResponse.setGuestPhone(order.getGuestPhone());
         orderResponse.setOrderDate(order.getOrderDate());
         orderResponse.setDiscount(order.getDiscount());
         orderResponse.setTotalAmount(order.getTotalAmount());
@@ -94,6 +96,17 @@ public class OrderMapper {
         orderResponse.setOrderItems(order.getOrderItems().stream()
                 .map(this::toOrderItemResponse)
                 .collect(Collectors.toList()));
+
+        if (order.getCustomer() != null) {
+            Customers customer = order.getCustomer();
+            String fullName = customer.getFirstName();
+            if (customer.getLastName() != null) {
+                fullName += " " + customer.getLastName();
+            }
+            orderResponse.setFullName(fullName);
+            orderResponse.setEmail(customer.getEmail());
+            orderResponse.setPhoneNumber(customer.getPhoneNumber());
+        }
 
         return orderResponse;
     }
@@ -110,7 +123,7 @@ public class OrderMapper {
         order.setOrderDate(orderRequest.getOrderDate());
         order.setDiscount(orderRequest.getDiscount());
         order.setTotalAmount(orderRequest.getTotalAmount());
-        order.setStatus(orderRequest.getStatus());
+        order.setStatus(OrderStatus.PENDING);
         order.setLatitude(orderRequest.getLatitude());
         order.setLongitude(orderRequest.getLongitude());
         order.setShippingAddress(orderRequest.getShippingAddress());

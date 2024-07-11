@@ -15,11 +15,11 @@ public class OrderResponse {
 
     private Long customerId;
 
-    private String guestName;
+    private String fullName;
 
-    private String guestEmail;
+    private String email;
 
-    private String guestPhone;
+    private String phoneNumber;
 
     private LocalDateTime orderDate;
 
