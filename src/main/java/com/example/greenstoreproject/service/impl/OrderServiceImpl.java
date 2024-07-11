@@ -11,7 +11,6 @@ import com.example.greenstoreproject.repository.*;
 import com.example.greenstoreproject.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import java.util.*;
@@ -83,12 +82,9 @@ public class OrderServiceImpl implements OrderService {
                 .orElseThrow(() -> new RuntimeException("Order not found"));
         validateOrderAccess(currentCustomer, existingOrder);
 
-        Orders updatedOrder = orderMapper.toOrder(orderRequest);
-        updatedOrder.setOrderId(existingOrder.getOrderId());
-        updatedOrder.setCustomer(existingOrder.getCustomer());
-        updatedOrder.setOrderItems(updateOrderItems(updatedOrder, orderRequest.getOrderItems()));
+        existingOrder.setShippingAddress(orderRequest.getShippingAddress());
 
-        Orders savedOrder = orderRepository.save(updatedOrder);
+        Orders savedOrder = orderRepository.save(existingOrder);
         return orderMapper.toOrderResponse(savedOrder);
     }
 
@@ -170,16 +166,4 @@ public class OrderServiceImpl implements OrderService {
         return customerRepository.findByEmail(currentCustomerEmail);
     }
 
-    private List<OrderItems> updateOrderItems(Orders updatedOrder, List<OrderItemRequest> orderItemRequests) {
-        List<OrderItems> orderItems = new ArrayList<>();
-        orderItemRequests.forEach(item -> {
-            Products product = productRepository.findById(item.getProductId())
-                    .orElseThrow(() -> new RuntimeException("Product not found"));
-            OrderItems orderItem = orderMapper.toOrderItem(item);
-            orderItem.setProduct(product);
-            orderItem.setOrder(updatedOrder);
-            orderItems.add(orderItem);
-        });
-        return orderItems;
-    }
 }
