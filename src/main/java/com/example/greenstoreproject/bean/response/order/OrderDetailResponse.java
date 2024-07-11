@@ -1,6 +1,5 @@
 package com.example.greenstoreproject.bean.response.order;
 
-import com.example.greenstoreproject.bean.request.orderItem.OrderItemRequest;
 import com.example.greenstoreproject.bean.response.orderItem.OrderItemResponse;
 import com.example.greenstoreproject.entity.OrderStatus;
 import lombok.Data;
@@ -9,8 +8,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
-public class OrderResponse {
-
+public class OrderDetailResponse {
     private Long orderId;
 
     private Long customerId;
@@ -35,4 +33,5 @@ public class OrderResponse {
 
     private String shippingAddress;
 
+    private List<OrderItemResponse> orderItems;
 }

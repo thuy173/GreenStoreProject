@@ -2,6 +2,8 @@ package com.example.greenstoreproject.mapper;
 
 import com.example.greenstoreproject.bean.request.order.OrderRequest;
 import com.example.greenstoreproject.bean.request.orderItem.OrderItemRequest;
+import com.example.greenstoreproject.bean.response.order.OrderCustomerResponse;
+import com.example.greenstoreproject.bean.response.order.OrderDetailResponse;
 import com.example.greenstoreproject.bean.response.order.OrderResponse;
 import com.example.greenstoreproject.bean.response.orderItem.OrderItemResponse;
 import com.example.greenstoreproject.bean.response.productImage.ProductImageResponse;
@@ -48,16 +50,35 @@ public class OrderMapper {
         orderResponse.setLongitude(order.getLongitude());
         orderResponse.setShippingAddress(order.getShippingAddress());
 
-
         return orderResponse;
     }
 
-    public OrderResponse toOrderDetailResponse(Orders order) {
+    public OrderCustomerResponse toOrderCustomerResponse(Orders order) {
         if (order == null) {
             return null;
         }
 
-        OrderResponse orderResponse = new OrderResponse();
+        OrderCustomerResponse orderResponse = new OrderCustomerResponse();
+        orderResponse.setOrderId(order.getOrderId());
+        orderResponse.setOrderDate(order.getOrderDate());
+        orderResponse.setDiscount(order.getDiscount());
+        orderResponse.setTotalAmount(order.getTotalAmount());
+        orderResponse.setStatus(order.getStatus());
+        orderResponse.setOrderItems(order.getOrderItems().stream()
+                .map(this::toOrderItemResponse)
+                .collect(Collectors.toList()));
+
+
+        return orderResponse;
+    }
+
+
+    public OrderDetailResponse toOrderDetailResponse(Orders order) {
+        if (order == null) {
+            return null;
+        }
+
+        OrderDetailResponse orderResponse = new OrderDetailResponse();
         orderResponse.setOrderId(order.getOrderId());
         orderResponse.setCustomerId(order.getCustomer() != null ? order.getCustomer().getCustomerId() : null);
         orderResponse.setGuestName(order.getGuestName());

@@ -1,12 +1,16 @@
 package com.example.greenstoreproject.controller;
 
 import com.example.greenstoreproject.bean.request.order.OrderRequest;
+import com.example.greenstoreproject.bean.response.order.OrderCustomerResponse;
+import com.example.greenstoreproject.bean.response.order.OrderDetailResponse;
 import com.example.greenstoreproject.bean.response.order.OrderResponse;
 import com.example.greenstoreproject.entity.OrderStatus;
 import com.example.greenstoreproject.service.OrderService;
 import com.example.greenstoreproject.service.impl.AuthServiceImpl;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,13 +29,20 @@ public class OrderController {
     }
 
     @GetMapping("/{orderId}")
-    public OrderResponse getOrderById(@PathVariable Long orderId) {
+    public OrderDetailResponse getOrderById(@PathVariable Long orderId) {
         return orderService.getOrderById(orderId);
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public List<OrderResponse> getAllOrders() {
         return orderService.getAllOrders();
+    }
+
+    @GetMapping("/myOrders")
+    public ResponseEntity<List<OrderCustomerResponse>> getAllOrdersByCurrentCustomer() {
+        List<OrderCustomerResponse> orders = orderService.getAllOrdersByCurrentCustomer();
+        return ResponseEntity.ok(orders);
     }
 
     @PutMapping("/{orderId}")
