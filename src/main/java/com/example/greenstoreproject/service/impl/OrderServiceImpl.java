@@ -62,6 +62,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public List<OrderResponse> getAllOrders() {
         return orderRepository.findAll().stream()
+                .sorted(Comparator.comparing(Orders::getOrderDate).reversed())
                 .map(orderMapper::toOrderResponse)
                 .collect(Collectors.toList());
     }
@@ -69,7 +70,10 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public List<OrderCustomerResponse> getAllOrdersByCurrentCustomer() {
         Customers currentCustomer = getCurrentCustomer();
-        List<Orders> orders = orderRepository.findByCustomerCustomerId(currentCustomer.getCustomerId());
+        List<Orders> orders = orderRepository.findByCustomerCustomerId(currentCustomer.getCustomerId())
+                .stream()
+                .sorted(Comparator.comparing(Orders::getOrderDate).reversed())
+                .collect(Collectors.toList());
         return orders.stream()
                 .map(orderMapper::toOrderCustomerResponse)
                 .collect(Collectors.toList());

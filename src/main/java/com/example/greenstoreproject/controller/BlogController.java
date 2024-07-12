@@ -7,6 +7,7 @@ import com.example.greenstoreproject.service.BlogService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,8 +29,8 @@ public class BlogController {
         return blogService.getBlogById(id);
     }
 
-    @PostMapping
-    public String addBlog(@Valid @RequestBody BlogRequest blogRequest) {
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public String addBlog(@Valid @ModelAttribute BlogRequest blogRequest) {
         return blogService.createBlog(blogRequest);
     }
 

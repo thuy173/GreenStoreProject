@@ -56,4 +56,7 @@ public class Customers {
 
     @Column(name = "avatar")
     private String avatar;
+
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Blog> blog;
 }

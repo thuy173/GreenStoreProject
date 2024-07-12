@@ -1,14 +1,12 @@
 package com.example.greenstoreproject.service.impl;
 
+import com.cloudinary.Cloudinary;
 import com.example.greenstoreproject.bean.request.blog.BlogRequest;
 import com.example.greenstoreproject.bean.response.blog.BlogDetailResponse;
 import com.example.greenstoreproject.bean.response.blog.BlogResponse;
 import com.example.greenstoreproject.entity.Blog;
-import com.example.greenstoreproject.entity.Categories;
-import com.example.greenstoreproject.exception.EmptyException;
 import com.example.greenstoreproject.exception.NotFoundException;
 import com.example.greenstoreproject.mapper.BlogMapper;
-import com.example.greenstoreproject.mapper.CategoryMapper;
 import com.example.greenstoreproject.repository.BlogRepository;
 import com.example.greenstoreproject.service.BlogService;
 import com.example.greenstoreproject.util.SuccessMessage;
@@ -22,6 +20,9 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class BlogServiceImpl implements BlogService {
     private final BlogRepository blogRepository;
+    private final Cloudinary cloudinary;
+    private final AuthServiceImpl authService;
+
 
     @Override
     public List<BlogResponse> getAllBlog() {
@@ -41,7 +42,7 @@ public class BlogServiceImpl implements BlogService {
 
     @Override
     public String createBlog(BlogRequest blogRequest) {
-        Blog blog = BlogMapper.convertToEntity(blogRequest);
+        Blog blog = BlogMapper.convertToEntity(blogRequest, cloudinary);
         blogRepository.save(blog);
         return SuccessMessage.SUCCESS_CREATED.getMessage();
     }

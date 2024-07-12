@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -67,4 +68,7 @@ public class Products {
 
     @Column(name = "status")
     private Integer status;
+
+    @Column(name = "create_at")
+    private LocalDateTime createAt;
 }

@@ -17,11 +17,14 @@ public class Blog {
     @Column(name = "title", nullable = false)
     private String title;
 
+    @Column(name = "description")
+    private String description;
+
+    @Column(name = "thumbnail")
+    private String thumbnail;
+
     @Column(name = "content", nullable = false)
     private String content;
-
-    @Column(name = "author")
-    private String author;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -31,4 +34,9 @@ public class Blog {
 
     @Column(name = "approved")
     private Boolean approved = false;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "customer_id")
+    private Customers customer;
+
 }
