@@ -18,6 +18,7 @@ import java.util.Map;
 public class BlogMapper {
     public static BlogResponse convertToResponse(Blog blog) {
         BlogResponse response = new BlogResponse();
+        response.setBlogId(blog.getBlogId());
         response.setTitle(blog.getTitle());
         response.setDescription(blog.getDescription());
         response.setThumbnail(blog.getThumbnail());
@@ -26,8 +27,10 @@ public class BlogMapper {
         return response;
     }
 
-    public static BlogDetailResponse convertToDetailResponse(Blog blog) {
+    public static BlogDetailResponse convertToDetailResponse(Blog blog, String author) {
         BlogDetailResponse response = new BlogDetailResponse();
+        response.setBlogId(blog.getBlogId());
+        response.setAuthor(author);
         response.setTitle(blog.getTitle());
         response.setContent(blog.getContent());
         response.setCreatedAt(blog.getCreatedAt());

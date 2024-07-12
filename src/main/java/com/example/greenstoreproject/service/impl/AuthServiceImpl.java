@@ -40,6 +40,14 @@ public class AuthServiceImpl implements UserDetailsService {
         return customer != null ? customer.getCustomerId() : null;
     }
 
+    public Customers getCustomerByEmail(String email) {
+        Customers customer = customerRepository.findByEmail(email);
+        if (customer == null) {
+            throw new UsernameNotFoundException("User not found with email: " + email);
+        }
+        return customer;
+    }
+
     public boolean isAdmin() {
         return SecurityContextHolder.getContext().getAuthentication().getAuthorities()
                 .stream().anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"));

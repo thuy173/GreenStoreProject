@@ -24,6 +24,16 @@ public class BlogController {
         return blogService.getAllBlog();
     }
 
+    @GetMapping("/app")
+    public List<BlogResponse> getAllBlogApprove() {
+        return blogService.getAllBlogApprove();
+    }
+
+    @GetMapping("/getAllByUser/{id}")
+    public List<BlogResponse> getAllBlogByCustomer(@PathVariable Long id) {
+        return blogService.getBlogByCustomerId(id);
+    }
+
     @GetMapping("/{id}")
     public BlogDetailResponse getById(@PathVariable Long id) {
         return blogService.getBlogById(id);
@@ -37,6 +47,11 @@ public class BlogController {
     @PutMapping("/{id}")
     public String updateBlog(@PathVariable Long id, @Valid @RequestBody BlogRequest blogRequest) {
         return blogService.updateBlog(id, blogRequest);
+    }
+
+    @PutMapping("/{id}/approve")
+    public String approveBlog(@PathVariable Long id) {
+        return blogService.approveBlog(id);
     }
 
     @DeleteMapping("/{id}")
