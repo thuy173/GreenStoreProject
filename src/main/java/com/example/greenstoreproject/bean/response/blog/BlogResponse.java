@@ -13,5 +13,6 @@ public class BlogResponse {
 
     private String thumbnail;
 
-    private Boolean approved = false;
+    private String createAt;
+
 }
