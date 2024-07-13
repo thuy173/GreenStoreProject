@@ -57,6 +57,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/customer/**").permitAll()
                         .requestMatchers("/api/review/**").permitAll()
                         .requestMatchers("/api/rating/**").permitAll()
+                        .requestMatchers("/api/blog/app").permitAll()
+                        .requestMatchers("/api/blog/{id}").permitAll()
                         .requestMatchers(AUTH_WHITELIST).permitAll()
                         .anyRequest().authenticated()
                 )

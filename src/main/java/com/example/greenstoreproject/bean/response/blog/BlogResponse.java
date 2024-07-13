@@ -15,4 +15,6 @@ public class BlogResponse {
 
     private String createAt;
 
+    private Boolean approved = false;
+
 }

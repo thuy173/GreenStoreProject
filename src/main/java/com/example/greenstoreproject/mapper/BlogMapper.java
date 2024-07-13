@@ -22,6 +22,7 @@ public class BlogMapper {
         response.setTitle(blog.getTitle());
         response.setDescription(blog.getDescription());
         response.setThumbnail(blog.getThumbnail());
+        response.setApproved(blog.getApproved());
         response.setCreateAt(blog.getCreatedAt().toString());
 
         return response;

@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -49,11 +50,13 @@ public class BlogController {
         return blogService.updateBlog(id, blogRequest);
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PutMapping("/{id}/approve")
     public String approveBlog(@PathVariable Long id) {
         return blogService.approveBlog(id);
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @DeleteMapping("/{id}")
     public String deleteBlog(@PathVariable Long id) {
         return blogService.deleteBlog(id);

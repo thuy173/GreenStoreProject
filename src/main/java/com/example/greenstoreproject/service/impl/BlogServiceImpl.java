@@ -79,9 +79,14 @@ public class BlogServiceImpl implements BlogService {
         Customers user = authService.getCustomerByEmail(email);
 
         Blog blog = BlogMapper.convertToEntity(blogRequest, cloudinary);
-        blog.setApproved(false);
         blog.setCreatedAt(LocalDateTime.now());
         blog.setCustomer(user);
+
+        if (authService.isAdmin()) {
+            blog.setApproved(true);
+        } else {
+            blog.setApproved(false);
+        }
 
         blogRepository.save(blog);
         return SuccessMessage.SUCCESS_CREATED.getMessage();
