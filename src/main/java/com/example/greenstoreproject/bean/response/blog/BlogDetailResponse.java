@@ -15,6 +15,10 @@ public class BlogDetailResponse {
 
     private String author;
 
+    private String thumbnail;
+
+    private String description;
+
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;

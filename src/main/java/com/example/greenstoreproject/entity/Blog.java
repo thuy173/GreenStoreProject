@@ -17,13 +17,15 @@ public class Blog {
     @Column(name = "title", nullable = false)
     private String title;
 
-    @Column(name = "description")
+    @Lob
+    @Column(name = "description", length = 65535)
     private String description;
 
     @Column(name = "thumbnail")
     private String thumbnail;
 
-    @Column(name = "content", nullable = false)
+    @Lob
+    @Column(name = "content", nullable = false, length = 65535)
     private String content;
 
     @Column(name = "created_at")

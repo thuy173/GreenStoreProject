@@ -45,8 +45,8 @@ public class BlogController {
         return blogService.createBlog(blogRequest);
     }
 
-    @PutMapping("/{id}")
-    public String updateBlog(@PathVariable Long id, @Valid @RequestBody BlogRequest blogRequest) {
+    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public String updateBlog(@PathVariable Long id, @Valid @ModelAttribute BlogRequest blogRequest) {
         return blogService.updateBlog(id, blogRequest);
     }
 

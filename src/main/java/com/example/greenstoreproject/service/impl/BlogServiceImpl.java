@@ -97,13 +97,23 @@ public class BlogServiceImpl implements BlogService {
         Blog blog = blogRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Blog not found " + id));
 
-        if (!isUserAllowedToEditBlog(blog)) {
+        String email = getAuthenticatedUserEmail();
+        Customers user = authService.getCustomerByEmail(email);
+        if (!user.getCustomerId().equals(blog.getCustomer().getCustomerId())) {
             throw new NotFoundException("You do not have permission to edit this blog");
         }
 
-        BlogMapper.updateFromRequest(blog, blogRequest);
+        BlogMapper.updateFromRequest(blog, blogRequest, cloudinary);
         blog.setUpdatedAt(LocalDateTime.now());
+
+        if (authService.isAdmin()) {
+            blog.setApproved(true);
+        } else {
+            blog.setApproved(false);
+        }
+
         blogRepository.save(blog);
+
         return SuccessMessage.SUCCESS_UPDATED.getMessage();
     }
 

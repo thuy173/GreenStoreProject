@@ -12,6 +12,7 @@ import com.example.greenstoreproject.entity.*;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.Map;
 
 @Component
@@ -34,6 +35,8 @@ public class BlogMapper {
         response.setAuthor(author);
         response.setTitle(blog.getTitle());
         response.setContent(blog.getContent());
+        response.setThumbnail(blog.getThumbnail());
+        response.setDescription(blog.getDescription());
         response.setCreatedAt(blog.getCreatedAt());
         response.setUpdatedAt(blog.getUpdatedAt());
         response.setApproved(blog.getApproved());
@@ -57,11 +60,20 @@ public class BlogMapper {
         return blog;
     }
 
-    public static void updateFromRequest(Blog blog, BlogRequest blogRequest) {
-        blogRequest.setTitle(blog.getTitle());
-        blogRequest.setDescription(blog.getDescription());
-        blogRequest.setThumbnail(blogRequest.getThumbnail());
-        blogRequest.setContent(blog.getContent());
+    public static void updateFromRequest(Blog blog, BlogRequest blogRequest, Cloudinary cloudinary) {
+        blog.setTitle(blogRequest.getTitle());
+        blog.setDescription(blogRequest.getDescription());
+        blog.setContent(blogRequest.getContent());
+
+        if (blogRequest.getThumbnail() != null && !blogRequest.getThumbnail().isEmpty()) {
+            try {
+                Map uploadResult = cloudinary.uploader().upload(blogRequest.getThumbnail().getBytes(), ObjectUtils.emptyMap());
+                String url = uploadResult.get("url").toString();
+                blog.setThumbnail(url);
+            } catch (IOException e) {
+                throw new RuntimeException("Thumbnail upload failed", e);
+            }
+        }
     }
 
 }
