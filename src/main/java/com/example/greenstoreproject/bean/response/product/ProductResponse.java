@@ -4,6 +4,7 @@ import com.example.greenstoreproject.bean.response.productImage.ProductImageResp
 import com.example.greenstoreproject.entity.ProductImages;
 import lombok.Data;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -22,4 +23,6 @@ public class ProductResponse {
     private Integer status;
 
     private List<ProductImageResponse> productImages;
+
+    private LocalDateTime createAt;
 }

@@ -55,6 +55,7 @@ public class ProductMapper {
         productResponse.setPrice(products.getPrice());
         productResponse.setDescription(products.getDescription());
         productResponse.setStatus(products.getStatus());
+        productResponse.setCreateAt(products.getCreateAt());
 
         UnitOfMeasure unitOfMeasure = products.getUnitOfMeasure();
         if (unitOfMeasure != null) {

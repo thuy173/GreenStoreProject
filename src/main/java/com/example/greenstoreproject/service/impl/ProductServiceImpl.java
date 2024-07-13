@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -87,6 +88,9 @@ public class ProductServiceImpl implements ProductService {
                 }).collect(Collectors.toList());
 
         Products products = productMapper.convertToProductEntity(productRequest, category, nutrients, productImages);
+
+        products.setCreateAt(LocalDateTime.now());
+
         productRepository.save(products);
         return SuccessMessage.SUCCESS_CREATED.getMessage();
     }
