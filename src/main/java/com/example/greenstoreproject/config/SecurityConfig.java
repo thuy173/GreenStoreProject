@@ -59,6 +59,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/rating/**").permitAll()
                         .requestMatchers("/api/blog/app").permitAll()
                         .requestMatchers("/api/blog/{id}").permitAll()
+                        .requestMatchers("/api/voucher").permitAll()
                         .requestMatchers(AUTH_WHITELIST).permitAll()
                         .anyRequest().authenticated()
                 )

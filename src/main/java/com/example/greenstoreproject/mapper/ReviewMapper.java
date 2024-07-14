@@ -1,8 +1,6 @@
 package com.example.greenstoreproject.mapper;
 
-import com.example.greenstoreproject.bean.request.rating.RatingRequest;
 import com.example.greenstoreproject.bean.request.review.ReviewRequest;
-import com.example.greenstoreproject.bean.response.rating.RatingResponse;
 import com.example.greenstoreproject.bean.response.review.ReviewResponse;
 import com.example.greenstoreproject.entity.*;
 import org.springframework.stereotype.Component;

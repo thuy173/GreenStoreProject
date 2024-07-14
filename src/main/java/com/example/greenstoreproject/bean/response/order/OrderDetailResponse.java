@@ -21,7 +21,9 @@ public class OrderDetailResponse {
 
     private LocalDateTime orderDate;
 
-    private Double discount;
+    private String orderCode;
+
+    private Long voucherId;
 
     private Double totalAmount;
 

@@ -3,9 +3,11 @@ package com.example.greenstoreproject.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.security.SecureRandom;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -17,6 +19,9 @@ public class Orders {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "order_id")
     private Long orderId;
+
+    @Column(name = "order_code", unique = true, nullable = false)
+    private String orderCode;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id")
@@ -34,8 +39,9 @@ public class Orders {
     @Column(name = "order_date")
     private LocalDateTime orderDate;
 
-    @Column(name = "discount")
-    private Double discount;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "voucher_id")
+    private Voucher voucher;
 
     @Column(name = "total_amount")
     private Double totalAmount;
@@ -61,6 +67,25 @@ public class Orders {
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Review> reviews = new ArrayList<>();
+
+    @PrePersist
+    public void generateOrderCode() {
+        this.orderCode = generateRandomCode();
+    }
+
+    private String generateRandomCode() {
+        SecureRandom random = new SecureRandom();
+        byte[] bytes = new byte[6];
+        random.nextBytes(bytes);
+        return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
+    }
+
+    public boolean canApplyVoucher() {
+        if (voucher != null && totalAmount != null) {
+            return totalAmount >= voucher.getMinOrderAmount();
+        }
+        return false;
+    }
 
     public void setDefaultShippingAddress() {
         if (customer != null) {

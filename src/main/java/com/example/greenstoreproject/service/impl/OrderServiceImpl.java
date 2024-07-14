@@ -45,6 +45,7 @@ public class OrderServiceImpl implements OrderService {
         }).collect(Collectors.toList());
 
         order.setOrderItems(orderItems);
+
         Orders savedOrder = orderRepository.save(order);
         updateCart(customer, orderItems);
         return orderMapper.toOrderResponse(savedOrder);

@@ -25,7 +25,7 @@ public class OrderRequest {
 
     private LocalDateTime orderDate;
 
-    private Double discount;
+    private Long voucherId;
 
     private Double totalAmount;
 

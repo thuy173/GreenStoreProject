@@ -9,6 +9,7 @@ import com.example.greenstoreproject.bean.response.orderItem.OrderItemResponse;
 import com.example.greenstoreproject.bean.response.productImage.ProductImageResponse;
 import com.example.greenstoreproject.entity.*;
 import com.example.greenstoreproject.repository.CustomerRepository;
+import com.example.greenstoreproject.repository.VoucherRepository;
 import com.example.greenstoreproject.service.GeoCodingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,7 @@ public class OrderMapper {
 
     @Autowired
     private CustomerRepository customersRepository;
+    private final VoucherRepository voucherRepository;
 
     @Autowired
     private GeoCodingService geoCodingService;
@@ -35,14 +37,19 @@ public class OrderMapper {
 
         OrderResponse orderResponse = new OrderResponse();
         orderResponse.setOrderId(order.getOrderId());
+        orderResponse.setOrderCode(order.getOrderCode());
         orderResponse.setCustomerId(order.getCustomer() != null ? order.getCustomer().getCustomerId() : null);
         orderResponse.setOrderDate(order.getOrderDate());
-        orderResponse.setDiscount(order.getDiscount());
         orderResponse.setTotalAmount(order.getTotalAmount());
         orderResponse.setStatus(order.getStatus());
         orderResponse.setLatitude(order.getLatitude());
         orderResponse.setLongitude(order.getLongitude());
         orderResponse.setShippingAddress(order.getShippingAddress());
+
+        if (order.getVoucher() != null && order.getVoucher().getVoucherId() != null) {
+            Voucher voucher = order.getVoucher();
+            orderResponse.setVoucherId(voucher.getVoucherId());
+        }
 
         if (order.getCustomer() != null) {
             Customers customer = order.getCustomer();
@@ -65,14 +72,18 @@ public class OrderMapper {
 
         OrderCustomerResponse orderResponse = new OrderCustomerResponse();
         orderResponse.setOrderId(order.getOrderId());
+        orderResponse.setOrderCode(order.getOrderCode());
         orderResponse.setOrderDate(order.getOrderDate());
-        orderResponse.setDiscount(order.getDiscount());
         orderResponse.setTotalAmount(order.getTotalAmount());
         orderResponse.setStatus(order.getStatus());
         orderResponse.setOrderItems(order.getOrderItems().stream()
                 .map(this::toOrderItemResponse)
                 .collect(Collectors.toList()));
 
+        if (order.getVoucher() != null && order.getVoucher().getVoucherId() != null) {
+            Voucher voucher = order.getVoucher();
+            orderResponse.setVoucherId(voucher.getVoucherId());
+        }
 
         return orderResponse;
     }
@@ -85,9 +96,9 @@ public class OrderMapper {
 
         OrderDetailResponse orderResponse = new OrderDetailResponse();
         orderResponse.setOrderId(order.getOrderId());
+        orderResponse.setOrderCode(order.getOrderCode());
         orderResponse.setCustomerId(order.getCustomer() != null ? order.getCustomer().getCustomerId() : null);
         orderResponse.setOrderDate(order.getOrderDate());
-        orderResponse.setDiscount(order.getDiscount());
         orderResponse.setTotalAmount(order.getTotalAmount());
         orderResponse.setStatus(order.getStatus());
         orderResponse.setLatitude(order.getLatitude());
@@ -96,6 +107,11 @@ public class OrderMapper {
         orderResponse.setOrderItems(order.getOrderItems().stream()
                 .map(this::toOrderItemResponse)
                 .collect(Collectors.toList()));
+
+        if (order.getVoucher() != null && order.getVoucher().getVoucherId() != null) {
+            Voucher voucher = order.getVoucher();
+            orderResponse.setVoucherId(voucher.getVoucherId());
+        }
 
         if (order.getCustomer() != null) {
             Customers customer = order.getCustomer();
@@ -121,7 +137,6 @@ public class OrderMapper {
         order.setGuestEmail(orderRequest.getGuestEmail());
         order.setGuestPhone(orderRequest.getGuestPhone());
         order.setOrderDate(orderRequest.getOrderDate());
-        order.setDiscount(orderRequest.getDiscount());
         order.setTotalAmount(orderRequest.getTotalAmount());
         order.setStatus(OrderStatus.PENDING);
         order.setLatitude(orderRequest.getLatitude());
@@ -130,6 +145,16 @@ public class OrderMapper {
         order.setOrderItems(orderRequest.getOrderItems().stream()
                 .map(this::toOrderItem)
                 .collect(Collectors.toList()));
+
+        if (orderRequest.getVoucherId() != null) {
+            Voucher voucher = findVoucherById(orderRequest.getVoucherId());
+            if (voucher != null && order.getTotalAmount() > voucher.getMinOrderAmount()) {
+                order.setVoucher(voucher);
+                double discount = order.getTotalAmount() * (voucher.getDiscount() / 100.0);
+                double discountedAmount = order.getTotalAmount() - discount;
+                order.setTotalAmount(discountedAmount);
+            }
+        }
 
         if (orderRequest.getCustomerId() != null) {
             Customers customer = findCustomerById(orderRequest.getCustomerId());
@@ -150,6 +175,10 @@ public class OrderMapper {
 
     private Customers findCustomerById(Long customerId) {
         return customersRepository.findById(customerId).orElse(null);
+    }
+
+    private Voucher findVoucherById(Long voucherId) {
+        return voucherRepository.findById(voucherId).orElse(null);
     }
 
     public OrderItemResponse toOrderItemResponse(OrderItems orderItem) {
