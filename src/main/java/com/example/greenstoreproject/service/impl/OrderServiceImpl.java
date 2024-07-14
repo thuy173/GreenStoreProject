@@ -6,10 +6,12 @@ import com.example.greenstoreproject.bean.response.order.OrderCustomerResponse;
 import com.example.greenstoreproject.bean.response.order.OrderDetailResponse;
 import com.example.greenstoreproject.bean.response.order.OrderResponse;
 import com.example.greenstoreproject.entity.*;
+import com.example.greenstoreproject.event.NewOrderEvent;
 import com.example.greenstoreproject.mapper.OrderMapper;
 import com.example.greenstoreproject.repository.*;
 import com.example.greenstoreproject.service.OrderService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -26,6 +28,7 @@ public class OrderServiceImpl implements OrderService {
     private final ProductRepository productRepository;
     private final OrderMapper orderMapper;
     private final CartRepository cartRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     public OrderResponse createOrder(OrderRequest orderRequest) {
@@ -48,6 +51,8 @@ public class OrderServiceImpl implements OrderService {
 
         Orders savedOrder = orderRepository.save(order);
         updateCart(customer, orderItems);
+
+        eventPublisher.publishEvent(new NewOrderEvent(this, order));
         return orderMapper.toOrderResponse(savedOrder);
     }
 

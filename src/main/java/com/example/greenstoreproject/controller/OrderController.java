@@ -4,11 +4,15 @@ import com.example.greenstoreproject.bean.request.order.OrderRequest;
 import com.example.greenstoreproject.bean.response.order.OrderCustomerResponse;
 import com.example.greenstoreproject.bean.response.order.OrderDetailResponse;
 import com.example.greenstoreproject.bean.response.order.OrderResponse;
+import com.example.greenstoreproject.entity.Notification;
 import com.example.greenstoreproject.entity.OrderStatus;
+import com.example.greenstoreproject.repository.NotificationRepository;
+import com.example.greenstoreproject.service.NotificationService;
 import com.example.greenstoreproject.service.OrderService;
 import com.example.greenstoreproject.service.impl.AuthServiceImpl;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +26,7 @@ import java.util.List;
 public class OrderController {
     private final OrderService orderService;
     private final AuthServiceImpl authService;
+    private final NotificationService notificationService;
 
     @PostMapping
     public OrderResponse createOrder(@RequestBody OrderRequest orderRequest) {
@@ -43,6 +48,12 @@ public class OrderController {
     public ResponseEntity<List<OrderCustomerResponse>> getAllOrdersByCurrentCustomer() {
         List<OrderCustomerResponse> orders = orderService.getAllOrdersByCurrentCustomer();
         return ResponseEntity.ok(orders);
+    }
+
+    @GetMapping("/notification")
+    public Page<Notification> getNotifications(@RequestParam int page,
+                                               @RequestParam int size) {
+        return notificationService.getNotifications(page, size);
     }
 
     @PutMapping("/{orderId}")
