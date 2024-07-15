@@ -21,18 +21,17 @@ public class NewOrderEventListener {
     @EventListener
     public void handleNewOrderEvent(NewOrderEvent event) {
         Orders order = event.getOrder();
+
         OrderResponse orderResponse = new OrderResponse();
         orderResponse.setOrderCode(order.getOrderCode());
         orderResponse.setOrderDate(order.getOrderDate());
         orderResponse.setFullName(order.getCustomer().getFirstName() + " " + order.getCustomer().getLastName());
 
-        Notification notification = new Notification();
-        notification.setOrderCode(order.getOrderCode());
-        notification.setCustomerId(order.getCustomer().getCustomerId());
-        notification.setFullName(order.getCustomer().getFirstName() + " " + order.getCustomer().getLastName());
-        notification.setOrderDate(order.getOrderDate());
-        notificationRepository.save(notification);
 
+        Notification notification = new Notification();
+        notification.setCustomerId(order.getCustomer().getCustomerId());
+        notification.setOrderId(order.getOrderId());
+        notificationRepository.save(notification);
 
         messagingTemplate.convertAndSend("/topic/orders", orderResponse);
     }

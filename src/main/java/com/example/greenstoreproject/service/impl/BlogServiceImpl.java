@@ -6,12 +6,14 @@ import com.example.greenstoreproject.bean.response.blog.BlogDetailResponse;
 import com.example.greenstoreproject.bean.response.blog.BlogResponse;
 import com.example.greenstoreproject.entity.Blog;
 import com.example.greenstoreproject.entity.Customers;
+import com.example.greenstoreproject.event.NewBlogEvent;
 import com.example.greenstoreproject.exception.NotFoundException;
 import com.example.greenstoreproject.mapper.BlogMapper;
 import com.example.greenstoreproject.repository.BlogRepository;
 import com.example.greenstoreproject.service.BlogService;
 import com.example.greenstoreproject.util.SuccessMessage;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
@@ -26,6 +28,7 @@ public class BlogServiceImpl implements BlogService {
     private final BlogRepository blogRepository;
     private final Cloudinary cloudinary;
     private final AuthServiceImpl authService;
+    private final ApplicationEventPublisher eventPublisher;
 
 
     @Override
@@ -87,8 +90,10 @@ public class BlogServiceImpl implements BlogService {
         } else {
             blog.setApproved(false);
         }
-
         blogRepository.save(blog);
+
+        eventPublisher.publishEvent(new NewBlogEvent(this, blog));
+
         return SuccessMessage.SUCCESS_CREATED.getMessage();
     }
 

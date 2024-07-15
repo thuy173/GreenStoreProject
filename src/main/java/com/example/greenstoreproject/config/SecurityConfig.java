@@ -60,6 +60,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/blog/app").permitAll()
                         .requestMatchers("/api/blog/{id}").permitAll()
                         .requestMatchers("/api/voucher").permitAll()
+                        .requestMatchers("/api/notification").permitAll()
                         .requestMatchers("/ws/**").permitAll()
                         .requestMatchers(AUTH_WHITELIST).permitAll()
                         .anyRequest().authenticated()

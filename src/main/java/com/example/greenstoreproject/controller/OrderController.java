@@ -26,7 +26,6 @@ import java.util.List;
 public class OrderController {
     private final OrderService orderService;
     private final AuthServiceImpl authService;
-    private final NotificationService notificationService;
 
     @PostMapping
     public OrderResponse createOrder(@RequestBody OrderRequest orderRequest) {
@@ -48,12 +47,6 @@ public class OrderController {
     public ResponseEntity<List<OrderCustomerResponse>> getAllOrdersByCurrentCustomer() {
         List<OrderCustomerResponse> orders = orderService.getAllOrdersByCurrentCustomer();
         return ResponseEntity.ok(orders);
-    }
-
-    @GetMapping("/notification")
-    public Page<Notification> getNotifications(@RequestParam int page,
-                                               @RequestParam int size) {
-        return notificationService.getNotifications(page, size);
     }
 
     @PutMapping("/{orderId}")

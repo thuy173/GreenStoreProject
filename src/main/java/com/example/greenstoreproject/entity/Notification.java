@@ -14,15 +14,13 @@ public class Notification {
     @Column(name = "notification_id")
     private Long notificationId;
 
-    @Column(name = "order_code")
-    private String orderCode;
-
     @Column(name = "customer_id")
     private Long customerId;
 
-    @Column(name = "full_name")
-    private String fullName;
+    @Column(name = "order_id")
+    private Long orderId;
 
-    @Column(name = "order_date")
-    private LocalDateTime orderDate;
+    @Column(name = "blog_id")
+    private Long blogId;
+
 }
