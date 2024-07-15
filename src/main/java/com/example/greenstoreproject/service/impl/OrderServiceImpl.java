@@ -10,6 +10,9 @@ import com.example.greenstoreproject.event.NewOrderEvent;
 import com.example.greenstoreproject.mapper.OrderMapper;
 import com.example.greenstoreproject.repository.*;
 import com.example.greenstoreproject.service.OrderService;
+import com.example.greenstoreproject.service.PaymentService;
+import com.stripe.exception.StripeException;
+import com.stripe.model.PaymentIntent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.annotation.Secured;
@@ -29,6 +32,8 @@ public class OrderServiceImpl implements OrderService {
     private final OrderMapper orderMapper;
     private final CartRepository cartRepository;
     private final ApplicationEventPublisher eventPublisher;
+    private final PaymentService paymentService;
+    private final PaymentRepository paymentRepository;
 
     @Override
     public OrderResponse createOrder(OrderRequest orderRequest) {
@@ -51,6 +56,30 @@ public class OrderServiceImpl implements OrderService {
 
         Orders savedOrder = orderRepository.save(order);
         updateCart(customer, orderItems);
+
+        try {
+            PaymentIntent paymentIntent = paymentService.createPaymentIntent(
+                    savedOrder.getTotalAmount().longValue(),
+                    "usd", // đơn vị tiền tệ
+                    "Order #" + savedOrder.getOrderId(),
+                    customer.getEmail()
+            );
+            Payment payment = new Payment();
+            payment.setOrder(savedOrder);
+            payment.setPaymentMethod("stripe");
+            payment.setPaymentIntentId(paymentIntent.getId());
+            payment.setAmount(savedOrder.getTotalAmount());
+            payment.setCurrency("usd");
+            payment.setStatus("pending");
+
+            payment = paymentRepository.save(payment);
+            savedOrder.setPayment(payment);
+
+            orderRepository.save(savedOrder);
+        } catch (StripeException e) {
+            log.error("Payment failed: {}", e.getMessage());
+            throw new RuntimeException("Payment failed: " + e.getMessage());
+        }
 
         eventPublisher.publishEvent(new NewOrderEvent(this, order));
         return orderMapper.toOrderResponse(savedOrder);
