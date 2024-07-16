@@ -141,7 +141,6 @@ public class OrderMapper {
         order.setGuestPhone(orderRequest.getGuestPhone());
         order.setOrderDate(orderRequest.getOrderDate());
         order.setTotalAmount(orderRequest.getTotalAmount());
-        order.setStatus(OrderStatus.PENDING);
         order.setLatitude(orderRequest.getLatitude());
         order.setLongitude(orderRequest.getLongitude());
         order.setShippingAddress(orderRequest.getShippingAddress());

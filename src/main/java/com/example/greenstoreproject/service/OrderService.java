@@ -24,4 +24,6 @@ public interface OrderService {
     void deleteOrder(Long orderId);
 
     OrderResponse updateOrderStatus(Long orderId, OrderStatus status, boolean isAdmin);
+
+    String changeOrderStatus(Long orderId, OrderStatus status);
 }

@@ -11,6 +11,7 @@ import com.example.greenstoreproject.mapper.OrderMapper;
 import com.example.greenstoreproject.repository.*;
 import com.example.greenstoreproject.service.OrderService;
 import com.example.greenstoreproject.service.PaymentService;
+import com.example.greenstoreproject.util.SuccessMessage;
 import com.stripe.exception.StripeException;
 import com.stripe.model.PaymentIntent;
 import lombok.RequiredArgsConstructor;
@@ -59,12 +60,15 @@ public class OrderServiceImpl implements OrderService {
         order.setOrderItems(orderItems);
 
         Orders savedOrder = orderRepository.save(order);
+
         updateCart(customer, orderItems);
+
+        int amountInCents = (int) Math.round(savedOrder.getTotalAmount() * 100);
         if ("stripe".equals(orderRequest.getPaymentMethod())) {
             try {
                 PaymentIntent paymentIntent = paymentService.createPaymentIntent(
-                        savedOrder.getTotalAmount().doubleValue(),
-                        "usd", // đơn vị tiền tệ
+                        amountInCents,
+                        "usd",
                         "Order #" + savedOrder.getOrderId(),
                         customer.getEmail()
                 );
@@ -77,6 +81,12 @@ public class OrderServiceImpl implements OrderService {
 
                 payment = paymentRepository.save(payment);
                 savedOrder.setPayment(payment);
+
+                if (paymentIntent.getStatus().equals("succeeded")) {
+                    savedOrder.setStatus(OrderStatus.PROCESSING);
+                } else {
+                    savedOrder.setStatus(OrderStatus.PENDING);
+                }
 
                 orderRepository.save(savedOrder);
             } catch (StripeException e) {
@@ -92,6 +102,7 @@ public class OrderServiceImpl implements OrderService {
 
             payment = paymentRepository.save(payment);
             savedOrder.setPayment(payment);
+            savedOrder.setStatus(OrderStatus.PENDING);
 
             orderRepository.save(savedOrder);
         } else {
@@ -173,6 +184,21 @@ public class OrderServiceImpl implements OrderService {
 
         Orders savedOrder = orderRepository.save(order);
         return orderMapper.toOrderResponse(savedOrder);
+    }
+
+    @Override
+    public String changeOrderStatus(Long orderId, OrderStatus status) {
+        Orders order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+
+        if (order.getStatus() == OrderStatus.PENDING && status == OrderStatus.PROCESSING) {
+            order.setStatus(OrderStatus.PROCESSING);
+            orderRepository.save(order);
+        } else {
+            throw new RuntimeException("Status change not allowed. Can only change from PENDING to PROCESSING.");
+        }
+
+        return SuccessMessage.SUCCESS_UPDATED.getMessage();
     }
 
     private Customers getOrCreateCustomer(OrderRequest orderRequest) {

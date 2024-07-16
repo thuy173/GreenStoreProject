@@ -4,15 +4,11 @@ import com.example.greenstoreproject.bean.request.order.OrderRequest;
 import com.example.greenstoreproject.bean.response.order.OrderCustomerResponse;
 import com.example.greenstoreproject.bean.response.order.OrderDetailResponse;
 import com.example.greenstoreproject.bean.response.order.OrderResponse;
-import com.example.greenstoreproject.entity.Notification;
 import com.example.greenstoreproject.entity.OrderStatus;
-import com.example.greenstoreproject.repository.NotificationRepository;
-import com.example.greenstoreproject.service.NotificationService;
 import com.example.greenstoreproject.service.OrderService;
 import com.example.greenstoreproject.service.impl.AuthServiceImpl;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -60,6 +56,13 @@ public class OrderController {
             @RequestParam("status") OrderStatus status) {
         boolean isAdmin = authService.isAdmin();
         return orderService.updateOrderStatus(orderId, status, isAdmin);
+    }
+
+    @PutMapping("/{orderId}/changeProcessing")
+    public String updateProcessingStatus(
+            @PathVariable Long orderId,
+            @RequestParam("status") OrderStatus status) {
+        return orderService.changeOrderStatus(orderId, status);
     }
 
     @DeleteMapping("/{orderId}")

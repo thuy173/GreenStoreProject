@@ -29,9 +29,9 @@ public class PaymentService {
         Stripe.apiKey = stripeApiKey;
     }
 
-    public PaymentIntent createPaymentIntent( Double amount, String currency, String description, String customerEmail) throws StripeException {
+    public PaymentIntent createPaymentIntent( Integer amountInCents, String currency, String description, String customerEmail) throws StripeException {
         Map<String, Object> params = new HashMap<>();
-        params.put("amount", amount);
+        params.put("amount", amountInCents);
         params.put("currency", currency);
         params.put("description", description);
         params.put("receipt_email", customerEmail);
@@ -44,7 +44,7 @@ public class PaymentService {
 
         Payment payment = new Payment();
         payment.setOrder(order);
-        payment.setAmount(amount.doubleValue());
+        payment.setAmount(amount);
         payment.setCurrency(currency);
         payment.setStatus(status);
 
