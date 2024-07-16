@@ -35,5 +35,7 @@ public class OrderDetailResponse {
 
     private String shippingAddress;
 
+    private String paymentMethod;
+
     private List<OrderItemResponse> orderItems;
 }

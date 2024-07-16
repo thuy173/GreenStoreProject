@@ -45,6 +45,7 @@ public class OrderMapper {
         orderResponse.setLatitude(order.getLatitude());
         orderResponse.setLongitude(order.getLongitude());
         orderResponse.setShippingAddress(order.getShippingAddress());
+        orderResponse.setPaymentMethod(order.getPaymentMethod());
 
         if (order.getVoucher() != null && order.getVoucher().getVoucherId() != null) {
             Voucher voucher = order.getVoucher();
@@ -76,6 +77,7 @@ public class OrderMapper {
         orderResponse.setOrderDate(order.getOrderDate());
         orderResponse.setTotalAmount(order.getTotalAmount());
         orderResponse.setStatus(order.getStatus());
+        orderResponse.setPaymentMethod(order.getPaymentMethod());
         orderResponse.setOrderItems(order.getOrderItems().stream()
                 .map(this::toOrderItemResponse)
                 .collect(Collectors.toList()));
@@ -104,6 +106,7 @@ public class OrderMapper {
         orderResponse.setLatitude(order.getLatitude());
         orderResponse.setLongitude(order.getLongitude());
         orderResponse.setShippingAddress(order.getShippingAddress());
+        orderResponse.setPaymentMethod(order.getPaymentMethod());
         orderResponse.setOrderItems(order.getOrderItems().stream()
                 .map(this::toOrderItemResponse)
                 .collect(Collectors.toList()));
@@ -142,6 +145,7 @@ public class OrderMapper {
         order.setLatitude(orderRequest.getLatitude());
         order.setLongitude(orderRequest.getLongitude());
         order.setShippingAddress(orderRequest.getShippingAddress());
+        order.setPaymentMethod(orderRequest.getPaymentMethod());
         order.setOrderItems(orderRequest.getOrderItems().stream()
                 .map(this::toOrderItem)
                 .collect(Collectors.toList()));

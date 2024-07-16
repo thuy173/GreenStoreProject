@@ -18,8 +18,10 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+
 import java.util.*;
 import java.util.stream.Collectors;
+
 import lombok.extern.slf4j.Slf4j;
 
 @Service
@@ -40,7 +42,9 @@ public class OrderServiceImpl implements OrderService {
         Customers customer = getOrCreateCustomer(orderRequest);
         Orders order = orderMapper.toOrder(orderRequest);
         order.setCustomer(customer);
-
+        if (order.getTotalAmount() < 0.50) {
+            throw new IllegalArgumentException("Order amount must be at least $0.50 USD");
+        }
         List<OrderItems> orderItems = orderRequest.getOrderItems().stream().map(item -> {
             Products product = productRepository.findById(item.getProductId())
                     .orElseThrow(() -> new RuntimeException("Product not found"));
@@ -56,18 +60,32 @@ public class OrderServiceImpl implements OrderService {
 
         Orders savedOrder = orderRepository.save(order);
         updateCart(customer, orderItems);
+        if ("stripe".equals(orderRequest.getPaymentMethod())) {
+            try {
+                PaymentIntent paymentIntent = paymentService.createPaymentIntent(
+                        savedOrder.getTotalAmount().doubleValue(),
+                        "usd", // đơn vị tiền tệ
+                        "Order #" + savedOrder.getOrderId(),
+                        customer.getEmail()
+                );
+                Payment payment = new Payment();
+                payment.setOrder(savedOrder);
+                payment.setPaymentIntentId(paymentIntent.getId());
+                payment.setAmount(savedOrder.getTotalAmount());
+                payment.setCurrency("usd");
+                payment.setStatus("pending");
 
-        try {
-            PaymentIntent paymentIntent = paymentService.createPaymentIntent(
-                    savedOrder.getTotalAmount().longValue(),
-                    "usd", // đơn vị tiền tệ
-                    "Order #" + savedOrder.getOrderId(),
-                    customer.getEmail()
-            );
+                payment = paymentRepository.save(payment);
+                savedOrder.setPayment(payment);
+
+                orderRepository.save(savedOrder);
+            } catch (StripeException e) {
+                log.error("Payment failed: {}", e.getMessage());
+                throw new RuntimeException("Payment failed: " + e.getMessage());
+            }
+        } else if ("cod".equals(orderRequest.getPaymentMethod())) {
             Payment payment = new Payment();
             payment.setOrder(savedOrder);
-            payment.setPaymentMethod("stripe");
-            payment.setPaymentIntentId(paymentIntent.getId());
             payment.setAmount(savedOrder.getTotalAmount());
             payment.setCurrency("usd");
             payment.setStatus("pending");
@@ -76,9 +94,8 @@ public class OrderServiceImpl implements OrderService {
             savedOrder.setPayment(payment);
 
             orderRepository.save(savedOrder);
-        } catch (StripeException e) {
-            log.error("Payment failed: {}", e.getMessage());
-            throw new RuntimeException("Payment failed: " + e.getMessage());
+        } else {
+            throw new IllegalArgumentException("Invalid payment method");
         }
 
         eventPublisher.publishEvent(new NewOrderEvent(this, order));

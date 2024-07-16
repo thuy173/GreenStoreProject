@@ -37,4 +37,6 @@ public class OrderResponse {
 
     private String shippingAddress;
 
+    private String paymentMethod;
+
 }

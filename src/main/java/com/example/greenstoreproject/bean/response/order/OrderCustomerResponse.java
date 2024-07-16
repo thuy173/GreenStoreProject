@@ -21,5 +21,7 @@ public class OrderCustomerResponse {
 
     private OrderStatus status;
 
+    private String paymentMethod;
+
     private List<OrderItemResponse> orderItems;
 }

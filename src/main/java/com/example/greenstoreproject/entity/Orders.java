@@ -59,6 +59,9 @@ public class Orders {
     @Column(name = "shipping_address")
     private String shippingAddress;
 
+    @Column(name = "payment_method")
+    private String paymentMethod;
+
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItems> orderItems = new ArrayList<>();
 
@@ -68,8 +71,7 @@ public class Orders {
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Review> reviews = new ArrayList<>();
 
-    @OneToOne(mappedBy = "order", cascade = CascadeType.ALL)
-    @JoinColumn(name = "payment_id")
+    @OneToOne(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private Payment payment;
 
     @PrePersist
@@ -104,5 +106,20 @@ public class Orders {
                         + ", " + defaultAddress.getProvince();
             }
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Orders orders = (Orders) o;
+
+        return orderId != null ? orderId.equals(orders.orderId) : orders.orderId == null;
+    }
+
+    @Override
+    public int hashCode() {
+        return orderId != null ? orderId.hashCode() : 0;
     }
 }

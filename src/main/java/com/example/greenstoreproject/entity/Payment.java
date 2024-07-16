@@ -16,9 +16,6 @@ public class Payment {
     @JoinColumn(name = "order_id")
     private Orders order;
 
-    @Column(name = "payment_method")
-    private String paymentMethod;
-
     @Column(name = "payment_intent_id")
     private String paymentIntentId;
 
@@ -30,4 +27,19 @@ public class Payment {
 
     @Column(name = "status")
     private String status;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Payment payment = (Payment) o;
+
+        return paymentId != null ? paymentId.equals(payment.paymentId) : payment.paymentId == null;
+    }
+
+    @Override
+    public int hashCode() {
+        return paymentId != null ? paymentId.hashCode() : 0;
+    }
 }

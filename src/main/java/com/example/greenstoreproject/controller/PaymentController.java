@@ -25,28 +25,24 @@ public class PaymentController {
 
     @PostMapping
     public ResponseEntity<String> handlePayment(@RequestBody Map<String, Object> paymentData) {
-        Object paymentMethodObj = paymentData.get("paymentMethod");
+        Object orderIdObj = paymentData.get("orderId");
         Object amountObj = paymentData.get("amount");
         Object currencyObj = paymentData.get("currency");
         Object statusObj = paymentData.get("status");
         Object paymentIntentIdObj = paymentData.get("paymentIntentId");
 
-        if (paymentMethodObj == null || amountObj == null || currencyObj == null || statusObj == null || paymentIntentIdObj == null) {
+        if (orderIdObj== null || amountObj == null || currencyObj == null || statusObj == null || paymentIntentIdObj == null) {
             return ResponseEntity.badRequest().body("Invalid payment data");
         }
 
         try {
-            String paymentMethodId = paymentMethodObj.toString();
-            Double amount = Double.valueOf(amountObj.toString());
+            Long orderId = ((Number) orderIdObj).longValue();
+            Double amount = ((Number) amountObj).doubleValue();
             String currency = currencyObj.toString();
             String status = statusObj.toString();
             String paymentIntentId = paymentIntentIdObj.toString();
 
-            Payment payment = new Payment();
-            payment.setPaymentMethod(paymentMethodId);
-            payment.setAmount(amount);
-            payment.setCurrency(currency);
-            payment.setStatus(status);
+            Payment payment = paymentService.savePayment(orderId, amount, currency, status);
             payment.setPaymentIntentId(paymentIntentId);
 
             paymentRepository.save(payment);
