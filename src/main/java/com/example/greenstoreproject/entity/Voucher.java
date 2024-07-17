@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.security.SecureRandom;
+import java.time.LocalDateTime;
 import java.util.Base64;
 
 @Entity
@@ -23,6 +24,12 @@ public class Voucher {
 
     @Column(name = "min_order_amount", nullable = false)
     private Double minOrderAmount;
+
+    @Column(name = "expiry_date")
+    private LocalDateTime expiryDate;
+
+    @Column(name = "status")
+    private Boolean status;
 
     @PrePersist
     public void generateCode() {
