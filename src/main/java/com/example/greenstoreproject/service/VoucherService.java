@@ -13,4 +13,5 @@ public interface VoucherService {
     List<VoucherResponse> getAllVouchers();
     String updateVoucher(Long voucherId, VoucherRequest voucherRequest);
     String deleteVoucher(Long voucherId);
+    void activateVoucher(Long voucherId);
 }

@@ -6,6 +6,8 @@ import com.example.greenstoreproject.service.VoucherService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,18 +24,28 @@ public class VoucherController {
         return voucherService.getAllVouchers();
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping
     public String addVoucher(@Valid @RequestBody VoucherRequest voucherRequest){
         return voucherService.createVoucher(voucherRequest);
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PutMapping("/{id}")
     public String updateVoucher(@PathVariable Long id, @Valid @RequestBody VoucherRequest voucherRequest){
         return voucherService.updateVoucher(id, voucherRequest);
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @DeleteMapping("/{id}")
     public String deleteVoucher(@PathVariable Long id){
         return voucherService.deleteVoucher(id);
+    }
+
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PutMapping("/active/{id}")
+    public ResponseEntity<Void> activeVoucher(@PathVariable Long id) {
+        voucherService.activateVoucher(id);
+        return ResponseEntity.noContent().build();
     }
 }
