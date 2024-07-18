@@ -1,6 +1,8 @@
 package com.example.greenstoreproject.service.impl;
 
+import com.example.greenstoreproject.bean.response.notification.NotificationResponse;
 import com.example.greenstoreproject.entity.Notification;
+import com.example.greenstoreproject.mapper.NotificationMapper;
 import com.example.greenstoreproject.repository.NotificationRepository;
 import com.example.greenstoreproject.service.NotificationService;
 import lombok.RequiredArgsConstructor;
@@ -13,10 +15,13 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class NotificationServiceImpl implements NotificationService {
     private final NotificationRepository notificationRepository;
+    private final NotificationMapper notificationMapper;
 
     @Override
-    public Page<Notification> getNotifications(int page, int size) {
+    public Page<NotificationResponse> getNotifications(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        return notificationRepository.findAll(pageable);
+        Page<Notification> notifications = notificationRepository.findAll(pageable);
+
+        return notifications.map(notificationMapper::toResponse);
     }
 }

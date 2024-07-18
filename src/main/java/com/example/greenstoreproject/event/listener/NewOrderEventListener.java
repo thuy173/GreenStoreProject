@@ -27,7 +27,6 @@ public class NewOrderEventListener {
         orderResponse.setOrderDate(order.getOrderDate());
         orderResponse.setFullName(order.getCustomer().getFirstName() + " " + order.getCustomer().getLastName());
 
-
         Notification notification = new Notification();
         notification.setCustomerId(order.getCustomer().getCustomerId());
         notification.setOrderId(order.getOrderId());
