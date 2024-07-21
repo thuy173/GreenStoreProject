@@ -65,7 +65,7 @@ public class ProductMapper {
         }
 
         List<ProductImages> productImages = products.getProductImages();
-        if (!productImages.isEmpty()) {
+        if (productImages != null && !productImages.isEmpty()) {
             ProductImageResponse imageResponse = convertToProductImageDTO(productImages.get(0));
             productResponse.setProductImages(Collections.singletonList(imageResponse));
         } else {
@@ -85,27 +85,44 @@ public class ProductMapper {
         productResponse.setManufactureDate(product.getManufactureDate());
         productResponse.setExpiryDate(product.getExpiryDate());
 
-        Double averageRating = product.getRatings().stream()
-                .mapToDouble(Rating::getRatingValue)
-                .average()
-                .orElse(0.0);
-        productResponse.setRating(averageRating);
+        if (product.getRatings() != null) {
+            Double averageRating = product.getRatings().stream()
+                    .mapToDouble(Rating::getRatingValue)
+                    .average()
+                    .orElse(0.0);
+            productResponse.setRating(averageRating);
 
-        List<RatingResponse> ratingResponses = product.getRatings().stream()
-                .map(this::convertToRatingResponse)
-                .collect(Collectors.toList());
-        productResponse.setRatingList(ratingResponses);
+            List<RatingResponse> ratingResponses = product.getRatings().stream()
+                    .map(this::convertToRatingResponse)
+                    .collect(Collectors.toList());
+            productResponse.setRatingList(ratingResponses);
+        } else {
+            productResponse.setRating(0.0);
+            productResponse.setRatingList(Collections.emptyList());
+        }
 
-        List<ReviewResponse> reviewResponses = product.getReviews().stream()
-                .map(this::convertToReviewResponse)
-                .collect(Collectors.toList());
-        productResponse.setReview(reviewResponses);
+        if (product.getReviews() != null) {
+            List<ReviewResponse> reviewResponses = product.getReviews().stream()
+                    .map(this::convertToReviewResponse)
+                    .collect(Collectors.toList());
+            productResponse.setReview(reviewResponses);
+        } else {
+            productResponse.setReview(Collections.emptyList());
+        }
 
-        productResponse.setNutrients(product.getNutrients()
-                .stream().map(this::convertToNutrientDTO).collect(Collectors.toList()));
+        if (product.getNutrients() != null) {
+            productResponse.setNutrients(product.getNutrients()
+                    .stream().map(this::convertToNutrientDTO).collect(Collectors.toList()));
+        } else {
+            productResponse.setNutrients(Collections.emptyList());
+        }
 
-        productResponse.setProductImages(product.getProductImages()
-                .stream().map(this::convertToProductImageDTO).collect(Collectors.toList()));
+        if (product.getProductImages() != null) {
+            productResponse.setProductImages(product.getProductImages()
+                    .stream().map(this::convertToProductImageDTO).collect(Collectors.toList()));
+        } else {
+            productResponse.setProductImages(Collections.emptyList());
+        }
 
         UnitOfMeasure unitOfMeasure = product.getUnitOfMeasure();
         if (unitOfMeasure != null) {
@@ -145,9 +162,7 @@ public class ProductMapper {
         return products;
     }
 
-    public static void updateProductFromRequest(Products products, ProductUpdateRequest productRequest, Categories category,
-                                                List<Nutrients> nutrients
-    ) {
+    public static void updateProductFromRequest(Products products, ProductUpdateRequest productRequest, Categories category, List<Nutrients> nutrients) {
         if (productRequest.getProductName() != null && !productRequest.getProductName().isEmpty()) {
             products.setProductName(productRequest.getProductName());
         }
@@ -175,7 +190,5 @@ public class ProductMapper {
         if (nutrients != null && !nutrients.isEmpty()) {
             products.setNutrients(nutrients);
         }
-
-
     }
 }

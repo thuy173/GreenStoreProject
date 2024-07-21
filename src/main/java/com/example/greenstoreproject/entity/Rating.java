@@ -15,7 +15,7 @@ public class Rating {
     private Long ratingId;
 
     @Column(name = "rating_value")
-    private Integer ratingValue;
+    private Double ratingValue;
 
     @Column(name = "create_at")
     private LocalDateTime createAt;

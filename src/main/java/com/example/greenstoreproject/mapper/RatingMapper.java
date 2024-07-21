@@ -8,6 +8,9 @@ import com.example.greenstoreproject.entity.Products;
 import com.example.greenstoreproject.entity.Rating;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+
 @Component
 public class RatingMapper {
 
@@ -25,7 +28,7 @@ public class RatingMapper {
     public Rating convertToEntity(RatingRequest ratingRequest, Customers customers, Products products, Orders orders) {
         Rating rating = new Rating();
         rating.setRatingValue(ratingRequest.getRatingValue());
-        rating.setCreateAt(ratingRequest.getCreateAt());
+        rating.setCreateAt(LocalDateTime.now(ZoneOffset.UTC));
         rating.setCustomer(customers);
         rating.setProduct(products);
         rating.setOrder(orders);

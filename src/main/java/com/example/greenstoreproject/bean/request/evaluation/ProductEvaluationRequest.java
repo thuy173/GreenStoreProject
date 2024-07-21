@@ -1,11 +1,11 @@
-package com.example.greenstoreproject.bean.request.rating;
+package com.example.greenstoreproject.bean.request.evaluation;
 
 import lombok.Data;
 
 import java.time.LocalDateTime;
 
 @Data
-public class RatingRequest {
+public class ProductEvaluationRequest {
 
     private Double ratingValue;
 
@@ -16,4 +16,7 @@ public class RatingRequest {
     private Long customerId;
 
     private Long orderId;
+
+    private String content;
+
 }

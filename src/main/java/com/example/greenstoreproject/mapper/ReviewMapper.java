@@ -5,6 +5,9 @@ import com.example.greenstoreproject.bean.response.review.ReviewResponse;
 import com.example.greenstoreproject.entity.*;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+
 @Component
 public class ReviewMapper {
     public static ReviewResponse convertToResponse(Review review) {
@@ -21,7 +24,7 @@ public class ReviewMapper {
     public Review convertToEntity(ReviewRequest reviewRequest, Customers customers, Products products, Orders orders) {
         Review review = new Review();
         review.setContent(reviewRequest.getContent());
-        review.setCreateAt(reviewRequest.getCreateAt());
+        review.setCreateAt(LocalDateTime.now(ZoneOffset.UTC));
         review.setCustomer(customers);
         review.setProduct(products);
         review.setOrder(orders);

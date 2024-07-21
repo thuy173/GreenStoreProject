@@ -46,7 +46,7 @@ public class Orders {
     private Double totalAmount;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status")
+    @Column(name = "status", length = 30)
     private OrderStatus status;
 
     @Column(name = "latitude")

@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 public class RatingResponse {
 
     private Long ratingId;
-    private Integer ratingValue;
+    private Double ratingValue;
     private LocalDateTime createAt;
     private Long productId;
     private Long customerId;

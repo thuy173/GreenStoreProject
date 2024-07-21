@@ -62,6 +62,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/voucher/{id}").permitAll()
                         .requestMatchers("/api/voucher/**").permitAll()
                         .requestMatchers("/api/notification").permitAll()
+                        .requestMatchers("/api/evaluation").permitAll()
+                        .requestMatchers("/api/evaluation/**").permitAll()
                         .requestMatchers("/ws/**").permitAll()
                         .requestMatchers(AUTH_WHITELIST).permitAll()
                         .anyRequest().authenticated()
