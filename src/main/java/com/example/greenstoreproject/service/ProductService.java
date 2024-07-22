@@ -33,4 +33,8 @@ public interface ProductService {
     void softDeleteProduct(Long productId);
 
     void activateProduct(Long productId);
+
+    List<ProductResponse> searchProductsByName(String name);
+
+    List<ProductResponse> searchProductsByPriceRange(Double minPrice, Double maxPrice);
 }

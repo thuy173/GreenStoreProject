@@ -11,4 +11,11 @@ import java.util.List;
 public interface ProductRepository extends JpaRepository<Products, Long> {
     @Query("SELECT p FROM Products p WHERE p.status = 1")
     List<Products> findActiveProducts();
+
+    @Query("SELECT p FROM Products p WHERE LOWER(p.productName) LIKE LOWER(CONCAT('%', :name, '%'))")
+    List<Products> findByNameContainingIgnoreCase(String name);
+
+    @Query("SELECT p FROM Products p WHERE p.price BETWEEN :minPrice AND :maxPrice")
+    List<Products> findByPriceBetween(Double minPrice, Double maxPrice);
+
 }

@@ -95,8 +95,6 @@ public class ProductServiceImpl implements ProductService {
         return SuccessMessage.SUCCESS_CREATED.getMessage();
     }
 
-
-
     @Override
     public String updateProduct(Long id, ProductUpdateRequest productRequest) {
         Products products = productRepository.findById(id)
@@ -194,5 +192,27 @@ public class ProductServiceImpl implements ProductService {
             product.setStatus(1);
             productRepository.save(product);
         }
+    }
+
+    @Override
+    public List<ProductResponse> searchProductsByName(String name) {
+        List<Products> products = productRepository.findByNameContainingIgnoreCase(name);
+        if(products.isEmpty()){
+            throw new EmptyException("No products found with the name: " + name);
+        }
+        return products.stream()
+                .map(productMapper::convertToProductResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ProductResponse> searchProductsByPriceRange(Double minPrice, Double maxPrice) {
+        List<Products> products = productRepository.findByPriceBetween(minPrice, maxPrice);
+        if(products.isEmpty()){
+            throw new EmptyException("No products found in the price range: " + minPrice + " - " + maxPrice);
+        }
+        return products.stream()
+                .map(productMapper::convertToProductResponse)
+                .collect(Collectors.toList());
     }
 }

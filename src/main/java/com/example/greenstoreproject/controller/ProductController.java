@@ -79,4 +79,14 @@ public class ProductController {
         productService.activateProduct(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/searchByName")
+    public List<ProductResponse> searchByName(@RequestParam String name) {
+        return productService.searchProductsByName(name);
+    }
+
+    @GetMapping("/searchByPrice")
+    public List<ProductResponse> searchByPrice(@RequestParam Double minPrice, Double maxPrice) {
+        return productService.searchProductsByPriceRange(minPrice, maxPrice);
+    }
 }
