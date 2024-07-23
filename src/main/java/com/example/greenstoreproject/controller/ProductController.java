@@ -8,6 +8,9 @@ import com.example.greenstoreproject.service.ProductService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -30,8 +33,10 @@ public class ProductController {
     }
 
     @GetMapping
-    public List<ProductResponse> getAllProduct() {
-        return productService.getAllProduct();
+    public Page<ProductResponse> getAllProduct(@RequestParam(defaultValue = "0") int page,
+                                               @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return productService.getAllProduct(pageable);
     }
 
     @GetMapping("/{id}")
@@ -80,13 +85,15 @@ public class ProductController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/searchByName")
-    public List<ProductResponse> searchByName(@RequestParam String name) {
-        return productService.searchProductsByName(name);
-    }
+    @GetMapping("/search")
+    public ResponseEntity<Page<ProductResponse>> searchProducts(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) Double minPrice,
+            @RequestParam(required = false) Double maxPrice,
+            @RequestParam(required = false) String category,
+            Pageable pageable) {
 
-    @GetMapping("/searchByPrice")
-    public List<ProductResponse> searchByPrice(@RequestParam Double minPrice, Double maxPrice) {
-        return productService.searchProductsByPriceRange(minPrice, maxPrice);
+        Page<ProductResponse> products = productService.searchProducts(name, minPrice, maxPrice, category, pageable);
+        return ResponseEntity.ok(products);
     }
 }

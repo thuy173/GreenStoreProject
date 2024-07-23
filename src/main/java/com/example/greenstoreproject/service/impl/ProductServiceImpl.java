@@ -17,6 +17,8 @@ import com.example.greenstoreproject.repository.*;
 import com.example.greenstoreproject.service.ProductService;
 import com.example.greenstoreproject.util.SuccessMessage;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -51,14 +53,12 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<ProductResponse> getAllProduct() {
-        List<Products> products = productRepository.findActiveProducts();
+    public Page<ProductResponse> getAllProduct(Pageable pageable) {
+        Page<Products> products = productRepository.findActiveProducts(pageable);
         if(products.isEmpty()){
             throw new EmptyException("Product list is Empty");
         }
-        return products.stream()
-                .map(productMapper::convertToProductResponse)
-                .collect(Collectors.toList());
+        return products.map(productMapper::convertToProductResponse);
     }
 
     @Override
@@ -195,24 +195,16 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<ProductResponse> searchProductsByName(String name) {
-        List<Products> products = productRepository.findByNameContainingIgnoreCase(name);
-        if(products.isEmpty()){
-            throw new EmptyException("No products found with the name: " + name);
+    public Page<ProductResponse> searchProducts(String name, Double minPrice, Double maxPrice, String category, Pageable pageable) {
+        Page<Products> products = productRepository.searchProducts(name, minPrice,
+                maxPrice, category, pageable);
+
+
+        if (products.isEmpty()) {
+            throw new EmptyException("No products found with the given criteria.");
         }
-        return products.stream()
-                .map(productMapper::convertToProductResponse)
-                .collect(Collectors.toList());
+
+        return products.map(productMapper::convertToProductResponse);
     }
 
-    @Override
-    public List<ProductResponse> searchProductsByPriceRange(Double minPrice, Double maxPrice) {
-        List<Products> products = productRepository.findByPriceBetween(minPrice, maxPrice);
-        if(products.isEmpty()){
-            throw new EmptyException("No products found in the price range: " + minPrice + " - " + maxPrice);
-        }
-        return products.stream()
-                .map(productMapper::convertToProductResponse)
-                .collect(Collectors.toList());
-    }
 }

@@ -7,18 +7,19 @@ import com.example.greenstoreproject.bean.response.category.CategoryResponse;
 import com.example.greenstoreproject.bean.response.product.ProductDetailResponse;
 import com.example.greenstoreproject.bean.response.product.ProductResponse;
 import com.example.greenstoreproject.entity.Products;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.Map;
 
 @Service
 public interface ProductService {
 
     List<ProductResponse> getAllProductStatus();
 
-    List<ProductResponse> getAllProduct();
+    Page<ProductResponse> getAllProduct(Pageable pageable);
 
     ProductDetailResponse getProductById(Long id);
 
@@ -34,7 +35,5 @@ public interface ProductService {
 
     void activateProduct(Long productId);
 
-    List<ProductResponse> searchProductsByName(String name);
-
-    List<ProductResponse> searchProductsByPriceRange(Double minPrice, Double maxPrice);
+    Page<ProductResponse> searchProducts(String name, Double minPrice, Double maxPrice, String category, Pageable pageable);
 }
