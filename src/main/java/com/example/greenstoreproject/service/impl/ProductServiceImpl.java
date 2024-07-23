@@ -196,9 +196,13 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Page<ProductResponse> searchProducts(String name, Double minPrice, Double maxPrice, String category, Pageable pageable) {
-        Page<Products> products = productRepository.searchProducts(name, minPrice,
-                maxPrice, category, pageable);
+        Page<Products> products;
 
+        if ("all".equalsIgnoreCase(category)) {
+            products = productRepository.searchProductsWithoutCategory(name, minPrice, maxPrice, pageable);
+        } else {
+            products = productRepository.searchProducts(name, minPrice, maxPrice, category, pageable);
+        }
 
         if (products.isEmpty()) {
             throw new EmptyException("No products found with the given criteria.");

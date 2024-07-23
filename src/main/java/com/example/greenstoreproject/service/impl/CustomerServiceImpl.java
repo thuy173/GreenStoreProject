@@ -35,7 +35,7 @@ public class CustomerServiceImpl implements CustomerService {
     private final Cloudinary cloudinary;
     private final JwtUtil jwtUtil;
 
-    private static final String DEFAULT_AVATAR_URL = "http://res.cloudinary.com/dmmk9racr/image/upload/v1720583529/z4hzrmjbq1cc3dvz1xjz.png";
+    private static final String DEFAULT_AVATAR_URL = "https://res.cloudinary.com/dmmk9racr/image/upload/v1719990962/55b1d314fe954b6b35159c0fe4022975_gnqobv.png";
 
     @Override
     public Customers createUser(CustomerRegisterRequest customerRegisterRequest) {

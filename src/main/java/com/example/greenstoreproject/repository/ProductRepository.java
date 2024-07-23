@@ -30,4 +30,10 @@ public interface ProductRepository extends JpaRepository<Products, Long>, Paging
             Pageable pageable
     );
 
+    @Query("SELECT p FROM Products p WHERE " +
+            "(?1 IS NULL OR p.productName LIKE %?1%) AND " +
+            "(?2 IS NULL OR p.price >= ?2) AND " +
+            "(?3 IS NULL OR p.price <= ?3)")
+    Page<Products> searchProductsWithoutCategory(String name, Double minPrice, Double maxPrice, Pageable pageable);
+
 }
