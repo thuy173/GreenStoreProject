@@ -20,13 +20,11 @@ public class NotificationResponse {
 
     private String orderCode;
 
-    private LocalDateTime orderDate;
-
     private Long blogId;
 
     private String title;
 
     private String thumbnail;
 
-    private LocalDateTime createdAt;
+    private LocalDateTime createAt;
 }

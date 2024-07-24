@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -23,8 +24,8 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public Page<NotificationResponse> getNotifications(int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        Page<Notification> notifications = notificationRepository.findAll(pageable);
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("createAt")));
+        Page<Notification> notifications = notificationRepository.findAllNotifications(pageable);
 
         return notifications.map(notificationMapper::toResponse);
     }

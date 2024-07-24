@@ -25,6 +25,7 @@ public class NotificationMapper {
         dto.setCustomerId(notification.getCustomerId());
         dto.setNotificationId(notification.getNotificationId());
         dto.setBlogId(notification.getBlogId());
+        dto.setCreateAt(notification.getCreateAt());
 
         if (notification.getOrderId() != null) {
             Orders order = orderRepository.findById(notification.getOrderId())
@@ -32,7 +33,6 @@ public class NotificationMapper {
 
             dto.setFullName(order.getCustomer().getFirstName() + " " + order.getCustomer().getLastName());
             dto.setOrderCode(order.getOrderCode());
-            dto.setOrderDate(order.getOrderDate());
 
             Customers customers = customerRepository.findById(notification.getCustomerId())
                     .orElseThrow(() -> new IllegalArgumentException("Customer not found with id: " + order.getCustomer().getCustomerId()));
@@ -45,7 +45,6 @@ public class NotificationMapper {
 
             dto.setTitle(blog.getTitle());
             dto.setThumbnail(blog.getThumbnail());
-            dto.setCreatedAt(blog.getCreatedAt());
         }
 
         return dto;
