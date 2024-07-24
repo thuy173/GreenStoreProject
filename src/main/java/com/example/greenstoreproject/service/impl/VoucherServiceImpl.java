@@ -2,7 +2,6 @@ package com.example.greenstoreproject.service.impl;
 
 import com.example.greenstoreproject.bean.request.voucher.VoucherRequest;
 import com.example.greenstoreproject.bean.response.voucher.VoucherResponse;
-import com.example.greenstoreproject.entity.Products;
 import com.example.greenstoreproject.entity.Voucher;
 import com.example.greenstoreproject.mapper.VoucherMapper;
 import com.example.greenstoreproject.repository.VoucherRepository;
@@ -40,6 +39,13 @@ public class VoucherServiceImpl implements VoucherService {
     @Override
     public List<VoucherResponse> getAllVouchers() {
         return voucherRepository.findAll().stream()
+                .map(voucherMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<VoucherResponse> getActiveVouchers() {
+        return voucherRepository.findActiveVoucher().stream()
                 .map(voucherMapper::toDto)
                 .collect(Collectors.toList());
     }
