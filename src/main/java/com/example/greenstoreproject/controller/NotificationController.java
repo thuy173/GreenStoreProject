@@ -29,8 +29,6 @@ public class NotificationController {
 
     private final NotificationRepository notificationRepository;
     private final NotificationService notificationService;
-    private final OrderRepository orderRepository;
-
 
     @MessageMapping("/newOrder")
     @SendTo("/topic/orders")
@@ -39,14 +37,8 @@ public class NotificationController {
         List<Notification> notifications = notificationRepository.findByCustomerId(orderResponse.getCustomerId());
         List<OrderResponse> responses = notifications.stream()
                 .map(notification -> {
-                    Orders order = orderRepository.findById(notification.getOrderId())
-                            .orElseThrow(() -> new NotFoundException("Order not found for ID: " + notification.getOrderId()));
-
                     OrderResponse response = new OrderResponse();
                     response.setOrderId(notification.getOrderId());
-                    response.setOrderCode(order.getOrderCode());
-                    response.setOrderDate(order.getOrderDate());
-                    response.setFullName(order.getCustomer().getFirstName() + " " + order.getCustomer().getLastName());
                     return response;
                 })
                 .collect(Collectors.toList());

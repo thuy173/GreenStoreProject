@@ -28,6 +28,7 @@ public class NewBlogEventListener {
         Notification notification = new Notification();
         notification.setCustomerId(blog.getCustomer().getCustomerId());
         notification.setBlogId(blog.getBlogId());
+        notification.setCreateAt(blog.getCreatedAt());
         notificationRepository.save(notification);
 
 

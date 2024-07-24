@@ -24,6 +24,11 @@ public class VoucherController {
         return voucherService.getAllVouchers();
     }
 
+    @GetMapping("/active")
+    public List<VoucherResponse> getActiveVoucher() {
+        return voucherService.getActiveVouchers();
+    }
+
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping
     public String addVoucher(@Valid @RequestBody VoucherRequest voucherRequest){

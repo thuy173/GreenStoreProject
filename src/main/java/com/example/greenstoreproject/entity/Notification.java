@@ -14,6 +14,9 @@ public class Notification {
     @Column(name = "notification_id")
     private Long notificationId;
 
+    @Column(name = "create_at")
+    private LocalDateTime createAt;
+
     @Column(name = "customer_id")
     private Long customerId;
 

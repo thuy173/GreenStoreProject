@@ -30,6 +30,7 @@ public class NewOrderEventListener {
         Notification notification = new Notification();
         notification.setCustomerId(order.getCustomer().getCustomerId());
         notification.setOrderId(order.getOrderId());
+        notification.setCreateAt(order.getOrderDate());
         notificationRepository.save(notification);
 
         messagingTemplate.convertAndSend("/topic/orders", orderResponse);
