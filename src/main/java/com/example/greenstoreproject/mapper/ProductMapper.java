@@ -9,6 +9,7 @@ import com.example.greenstoreproject.bean.response.productImage.ProductImageResp
 import com.example.greenstoreproject.bean.response.rating.RatingResponse;
 import com.example.greenstoreproject.bean.response.review.ReviewResponse;
 import com.example.greenstoreproject.entity.*;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
@@ -16,7 +17,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
+@RequiredArgsConstructor
 public class ProductMapper {
+
+    private final RatingMapper ratingMapper;
 
     private NutrientResponse convertToNutrientDTO(Nutrients nutrient) {
         NutrientResponse dto = new NutrientResponse();
@@ -32,19 +36,14 @@ public class ProductMapper {
         return dto;
     }
 
-    private RatingResponse convertToRatingResponse(Rating rating) {
-        RatingResponse ratingResponse = new RatingResponse();
-        ratingResponse.setRatingId(rating.getRatingId());
-        ratingResponse.setRatingValue(rating.getRatingValue());
-        ratingResponse.setCreateAt(rating.getCreateAt());
-        return ratingResponse;
-    }
-
     private ReviewResponse convertToReviewResponse(Review review) {
         ReviewResponse reviewResponse = new ReviewResponse();
         reviewResponse.setReviewId(review.getReviewId());
         reviewResponse.setContent(review.getContent());
         reviewResponse.setCreateAt(review.getCreateAt());
+        reviewResponse.setProductId(review.getProduct().getProductId());
+        reviewResponse.setCustomerId(review.getCustomer().getCustomerId());
+        reviewResponse.setOrderId(review.getOrder().getOrderId());
         return reviewResponse;
     }
 
@@ -56,6 +55,7 @@ public class ProductMapper {
         productResponse.setDescription(products.getDescription());
         productResponse.setStatus(products.getStatus());
         productResponse.setCreateAt(products.getCreateAt());
+        productResponse.setQuantityInStock(products.getQuantityInStock());
 
         UnitOfMeasure unitOfMeasure = products.getUnitOfMeasure();
         if (unitOfMeasure != null) {
@@ -93,7 +93,7 @@ public class ProductMapper {
             productResponse.setRating(averageRating);
 
             List<RatingResponse> ratingResponses = product.getRatings().stream()
-                    .map(this::convertToRatingResponse)
+                    .map(ratingMapper::convertToResponse)
                     .collect(Collectors.toList());
             productResponse.setRatingList(ratingResponses);
         } else {

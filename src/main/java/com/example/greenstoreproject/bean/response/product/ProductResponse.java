@@ -18,6 +18,8 @@ public class ProductResponse {
 
     private String description;
 
+    private Double quantityInStock;
+
     private String unitOfMeasure;
 
     private Integer status;

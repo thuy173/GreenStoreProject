@@ -14,7 +14,7 @@ import java.time.ZoneOffset;
 @Component
 public class RatingMapper {
 
-    public static RatingResponse convertToResponse(Rating rating) {
+    public RatingResponse convertToResponse(Rating rating) {
         RatingResponse response = new RatingResponse();
         response.setRatingId(rating.getRatingId());
         response.setRatingValue(rating.getRatingValue());

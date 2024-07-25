@@ -89,11 +89,8 @@ public class ProductEvaluationServiceImpl implements ProductEvaluationService {
                 Rating rating = ratingMapper.convertToEntity(ratingRequest, customers, products, orders);
                 ratingRepository.save(rating);
 
-                System.out.println("Updating order status to REVIEWED for order id: {}"+ orders.getOrderId());
                 orders.setStatus(OrderStatus.REVIEWED);
                 orderRepository.save(orders);
-
-                System.out.println("Order status successfully updated to REVIEWED for order id: {}"+ orders.getOrderId());
 
             } catch (IllegalStateException e) {
                 return e.getMessage();
@@ -111,7 +108,7 @@ public class ProductEvaluationServiceImpl implements ProductEvaluationService {
 
         List<Rating> ratings = ratingRepository.findByProductId(productId);
         List<RatingResponse> ratingResponses = ratings.stream()
-                .map(RatingMapper::convertToResponse)
+                .map(ratingMapper::convertToResponse)
                 .collect(Collectors.toList());
 
         ProductEvaluationResponse response = new ProductEvaluationResponse();

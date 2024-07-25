@@ -53,7 +53,7 @@ public class RatingServiceImpl implements RatingService {
     public List<RatingResponse> getRatingByProductId(Long productId) {
         List<Rating> rating = ratingRepository.findByProductId(productId);
         return rating.stream()
-                .map(RatingMapper::convertToResponse)
+                .map(ratingMapper::convertToResponse)
                 .collect(Collectors.toList());
     }
 }
