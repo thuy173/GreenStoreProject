@@ -2,6 +2,7 @@ package com.example.greenstoreproject.mapper;
 
 import com.example.greenstoreproject.bean.request.product.ProductRequest;
 import com.example.greenstoreproject.bean.request.product.ProductUpdateRequest;
+import com.example.greenstoreproject.bean.response.evaluation.ProductEvaluationResponse;
 import com.example.greenstoreproject.bean.response.nutrient.NutrientResponse;
 import com.example.greenstoreproject.bean.response.product.ProductDetailResponse;
 import com.example.greenstoreproject.bean.response.product.ProductResponse;
@@ -12,6 +13,7 @@ import com.example.greenstoreproject.entity.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -85,30 +87,35 @@ public class ProductMapper {
         productResponse.setManufactureDate(product.getManufactureDate());
         productResponse.setExpiryDate(product.getExpiryDate());
 
+        List<ProductEvaluationResponse> ratingReviewList = new ArrayList<>();
+
         if (product.getRatings() != null) {
-            Double averageRating = product.getRatings().stream()
-                    .mapToDouble(Rating::getRatingValue)
-                    .average()
-                    .orElse(0.0);
-            productResponse.setRating(averageRating);
+            for (Rating rating : product.getRatings()) {
+                Double averageRating = product.getRatings().stream()
+                        .mapToDouble(Rating::getRatingValue)
+                        .average()
+                        .orElse(0.0);
+                productResponse.setRating(averageRating);
 
-            List<RatingResponse> ratingResponses = product.getRatings().stream()
-                    .map(ratingMapper::convertToResponse)
-                    .collect(Collectors.toList());
-            productResponse.setRatingList(ratingResponses);
-        } else {
-            productResponse.setRating(0.0);
-            productResponse.setRatingList(Collections.emptyList());
+                ProductEvaluationResponse dto = new ProductEvaluationResponse();
+                dto.setRatingValue(rating.getRatingValue());
+
+                Review review = product.getReviews().stream()
+                        .filter(r -> r.getOrder().getOrderId().equals(rating.getOrder().getOrderId())
+                                && r.getProduct().getProductId().equals(rating.getProduct().getProductId()))
+                        .findFirst().orElse(null);
+                if (review != null) {
+                    dto.setReviewComment(review.getContent());
+                    dto.setAvatar(review.getCustomer().getAvatar());
+                    dto.setAuthor(review.getCustomer().getFirstName() + " " + review.getCustomer().getLastName());
+                    dto.setReviewTime(review.getCreateAt());
+                }
+
+                ratingReviewList.add(dto);
+            }
         }
 
-        if (product.getReviews() != null) {
-            List<ReviewResponse> reviewResponses = product.getReviews().stream()
-                    .map(this::convertToReviewResponse)
-                    .collect(Collectors.toList());
-            productResponse.setReview(reviewResponses);
-        } else {
-            productResponse.setReview(Collections.emptyList());
-        }
+        productResponse.setRatingReviewList(ratingReviewList);
 
         if (product.getNutrients() != null) {
             productResponse.setNutrients(product.getNutrients()

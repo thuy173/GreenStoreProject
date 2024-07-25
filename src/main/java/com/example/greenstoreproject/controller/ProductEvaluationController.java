@@ -1,7 +1,6 @@
 package com.example.greenstoreproject.controller;
 
 import com.example.greenstoreproject.bean.request.evaluation.ProductEvaluationListRequest;
-import com.example.greenstoreproject.bean.request.evaluation.ProductEvaluationRequest;
 import com.example.greenstoreproject.bean.response.evaluation.ProductEvaluationResponse;
 import com.example.greenstoreproject.service.ProductEvaluationService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -20,9 +19,5 @@ public class ProductEvaluationController {
     public ResponseEntity<String> createProductEvaluation(@RequestBody ProductEvaluationListRequest request) {
         return ResponseEntity.ok(productEvaluationService.createProductEvaluation(request));
     }
-
-    @GetMapping("/{productId}")
-    public ResponseEntity<ProductEvaluationResponse> getEvaluationsByProductId(@PathVariable Long productId) {
-        return ResponseEntity.ok(productEvaluationService.getEvaluationsByProductId(productId));
-    }
+    
 }

@@ -1,5 +1,6 @@
 package com.example.greenstoreproject.bean.response.product;
 
+import com.example.greenstoreproject.bean.response.evaluation.ProductEvaluationResponse;
 import com.example.greenstoreproject.bean.response.nutrient.NutrientResponse;
 import com.example.greenstoreproject.bean.response.productImage.ProductImageResponse;
 import com.example.greenstoreproject.bean.response.rating.RatingResponse;
@@ -36,7 +37,6 @@ public class ProductDetailResponse {
 
     private Double rating;
 
-    private List<RatingResponse> ratingList;
+    private List<ProductEvaluationResponse> ratingReviewList;
 
-    private List<ReviewResponse> review;
 }

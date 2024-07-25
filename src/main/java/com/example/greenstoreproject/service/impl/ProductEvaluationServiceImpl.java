@@ -99,22 +99,4 @@ public class ProductEvaluationServiceImpl implements ProductEvaluationService {
         return SuccessMessage.SUCCESS_CREATED.getMessage();
     }
 
-    @Override
-    public ProductEvaluationResponse getEvaluationsByProductId(Long productId) {
-        List<Review> reviews = reviewRepository.findByProductId(productId);
-        List<ReviewResponse> reviewResponses = reviews.stream()
-                .map(ReviewMapper::convertToResponse)
-                .collect(Collectors.toList());
-
-        List<Rating> ratings = ratingRepository.findByProductId(productId);
-        List<RatingResponse> ratingResponses = ratings.stream()
-                .map(ratingMapper::convertToResponse)
-                .collect(Collectors.toList());
-
-        ProductEvaluationResponse response = new ProductEvaluationResponse();
-        response.setReviews(reviewResponses);
-        response.setRatings(ratingResponses);
-
-        return response;
-    }
 }
