@@ -60,9 +60,8 @@ public class OrderServiceImpl implements OrderService {
 
         order.setOrderItems(orderItems);
 
-        if (pointsToUse <= availablePoints) {
-            double discount = calculateDiscount(pointsToUse);
-            order.setTotalAmount(order.getTotalAmount() - discount);
+        if (pointsToUse <= availablePoints && pointsToUse <= orderRequest.getTotalAmount()) {
+            order.setTotalAmount(order.getTotalAmount() - pointsToUse);
             customer.setPoints(availablePoints - pointsToUse);
             customerRepository.save(customer);
         }
@@ -256,7 +255,4 @@ public class OrderServiceImpl implements OrderService {
         return customerRepository.findByEmail(currentCustomerEmail);
     }
 
-    private double calculateDiscount(Long points) {
-        return points * 0.1;
-    }
 }
