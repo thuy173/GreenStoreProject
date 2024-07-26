@@ -11,7 +11,7 @@ import java.util.List;
 
 @Service
 public interface OrderService {
-    OrderResponse createOrder(OrderRequest orderRequest);
+    OrderResponse createOrder(OrderRequest orderRequest, Long pointsToUse);
 
     OrderDetailResponse getOrderById(Long orderId);
 

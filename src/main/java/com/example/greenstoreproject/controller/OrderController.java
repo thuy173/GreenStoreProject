@@ -24,8 +24,8 @@ public class OrderController {
     private final AuthServiceImpl authService;
 
     @PostMapping
-    public OrderResponse createOrder(@RequestBody OrderRequest orderRequest) {
-        return orderService.createOrder(orderRequest);
+    public OrderResponse createOrder(@RequestBody OrderRequest orderRequest, @RequestParam Long pointsToUse) {
+        return orderService.createOrder(orderRequest, pointsToUse);
     }
 
     @GetMapping("/{orderId}")

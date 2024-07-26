@@ -43,6 +43,7 @@ public class CustomerMapper {
         customerResponse.setPhoneNumber(customers.getPhoneNumber());
         customerResponse.setAvatar(customers.getAvatar());
         customerResponse.setAddress(convertAddressList(customers.getAddress()));
+        customerResponse.setPoints(customers.getPoints());
 
         return customerResponse;
     }

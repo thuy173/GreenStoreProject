@@ -39,8 +39,9 @@ public class OrderServiceImpl implements OrderService {
     private final PaymentRepository paymentRepository;
 
     @Override
-    public OrderResponse createOrder(OrderRequest orderRequest) {
+    public OrderResponse createOrder(OrderRequest orderRequest, Long pointsToUse) {
         Customers customer = getOrCreateCustomer(orderRequest);
+        Long availablePoints = customer.getPoints();
         Orders order = orderMapper.toOrder(orderRequest);
         order.setCustomer(customer);
         if (order.getTotalAmount() < 0.50) {
@@ -58,6 +59,13 @@ public class OrderServiceImpl implements OrderService {
         }).collect(Collectors.toList());
 
         order.setOrderItems(orderItems);
+
+        if (pointsToUse <= availablePoints) {
+            double discount = calculateDiscount(pointsToUse);
+            order.setTotalAmount(order.getTotalAmount() - discount);
+            customer.setPoints(availablePoints - pointsToUse);
+            customerRepository.save(customer);
+        }
 
         Orders savedOrder = orderRepository.save(order);
 
@@ -248,4 +256,7 @@ public class OrderServiceImpl implements OrderService {
         return customerRepository.findByEmail(currentCustomerEmail);
     }
 
+    private double calculateDiscount(Long points) {
+        return points * 0.1;
+    }
 }

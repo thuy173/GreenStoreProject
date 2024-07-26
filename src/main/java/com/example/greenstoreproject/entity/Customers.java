@@ -59,4 +59,7 @@ public class Customers {
 
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Blog> blog;
+
+    @Column(name = "points")
+    private Long points = 0L;;
 }

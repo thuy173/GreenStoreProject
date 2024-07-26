@@ -92,6 +92,8 @@ public class ProductEvaluationServiceImpl implements ProductEvaluationService {
                 orders.setStatus(OrderStatus.REVIEWED);
                 orderRepository.save(orders);
 
+                addPointsToCustomer(review.getCustomer(), 100L);
+
             } catch (IllegalStateException e) {
                 return e.getMessage();
             }
@@ -99,4 +101,8 @@ public class ProductEvaluationServiceImpl implements ProductEvaluationService {
         return SuccessMessage.SUCCESS_CREATED.getMessage();
     }
 
+    private void addPointsToCustomer(Customers customer, Long points) {
+        customer.setPoints(customer.getPoints() + points);
+        customerRepository.save(customer);
+    }
 }

@@ -18,5 +18,7 @@ public class CustomerResponse {
 
     private String avatar;
 
+    private Long points;
+
     private List<AddressResponse> address = new ArrayList<>();
 }
