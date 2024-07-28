@@ -20,8 +20,7 @@ public class ComboController {
 
     @PostMapping
     public ResponseEntity<Combo> createCombo(@RequestBody ComboRequest request) {
-        Combo combo = comboService.createCombo(request.getComboName(), request.getDescription(),
-                request.getBmiStatus(), request.getProducts());
+        Combo combo = comboService.createCombo(request);
         return ResponseEntity.ok(combo);
     }
 

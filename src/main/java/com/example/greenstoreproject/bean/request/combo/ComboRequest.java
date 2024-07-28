@@ -11,4 +11,5 @@ public class ComboRequest {
     private String description;
     private BMIStatus bmiStatus;
     private List<ComboProductRequest> products;
+    private Integer duration;
 }

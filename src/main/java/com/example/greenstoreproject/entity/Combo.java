@@ -32,4 +32,7 @@ public class Combo {
 
     @Column(name = "price")
     private Double price;
+
+    @Column(name = "duration")
+    private int duration;
 }
