@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 
 
 @Service
@@ -33,13 +34,18 @@ public class PlanServiceImpl implements PlanService {
         plan.setCustomer(customer);
         plan.setCombo(combo);
 
-        LocalDate endDate = planRequest.getStartDate().plusDays(combo.getDuration());
+        LocalDate endDate = planRequest.getStartDate().plusDays(combo.getDuration() - 1);
         plan.setEndDate(endDate);
+
+        plan.setSchedules(new ArrayList<>());
 
         for (ScheduleRequest scheduleDTO : planRequest.getSchedules()) {
             Schedule schedule = new Schedule();
             schedule.setDate(scheduleDTO.getDate());
             schedule.setPlan(plan);
+            
+            schedule.setScheduledProducts(new ArrayList<>());
+
             for (ScheduleProductRequest productDTO : scheduleDTO.getScheduledProducts()) {
                 ComboProduct comboProduct = combo.getComboProducts().stream()
                         .filter(cp -> cp.getComboProductId().equals(productDTO.getComboProductId()))
@@ -54,6 +60,7 @@ public class PlanServiceImpl implements PlanService {
             }
             plan.getSchedules().add(schedule);
         }
+
         plan = planRepository.save(plan);
         return planMapper.toResponseDTO(plan);
     }

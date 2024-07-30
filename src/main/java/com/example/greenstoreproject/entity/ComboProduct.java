@@ -25,6 +25,6 @@ public class ComboProduct {
     private Products product;
 
     @Column(name = "quantity")
-    private Integer quantity;
+    private Double quantity;
 
 }

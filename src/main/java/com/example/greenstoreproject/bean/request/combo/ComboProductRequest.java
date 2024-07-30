@@ -5,5 +5,5 @@ import lombok.Data;
 @Data
 public class ComboProductRequest {
     private Long productId;
-    private Integer quantity;
+    private Double quantity;
 }

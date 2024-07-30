@@ -37,6 +37,7 @@ public class OrderServiceImpl implements OrderService {
     private final ApplicationEventPublisher eventPublisher;
     private final PaymentService paymentService;
     private final PaymentRepository paymentRepository;
+    private final ComboRepository comboRepository;
 
     @Override
     public OrderResponse createOrder(OrderRequest orderRequest, Long pointsToUse) {
@@ -47,16 +48,32 @@ public class OrderServiceImpl implements OrderService {
         if (order.getTotalAmount() < 0.50) {
             throw new IllegalArgumentException("Order amount must be at least $0.50 USD");
         }
-        List<OrderItems> orderItems = orderRequest.getOrderItems().stream().map(item -> {
-            Products product = productRepository.findById(item.getProductId())
-                    .orElseThrow(() -> new RuntimeException("Product not found"));
-            if (product.getQuantityInStock() < item.getQuantity()) {
-                throw new RuntimeException("Not enough stock for product: " + product.getProductName());
-            }
-            product.setQuantityInStock(product.getQuantityInStock() - item.getQuantity());
-            productRepository.save(product);
-            return toOrderItem(order, item, product);
-        }).collect(Collectors.toList());
+        List<OrderItems> orderItems;
+
+        if (orderRequest.isComboOrder()) {
+            Combo combo = comboRepository.findById(orderRequest.getComboId())
+                    .orElseThrow(() -> new RuntimeException("Combo not found"));
+            orderItems = combo.getComboProducts().stream().map(comboProduct -> {
+                Products product = comboProduct.getProduct();
+                if (product.getQuantityInStock() < 1) {
+                    throw new RuntimeException("Not enough stock for product: " + product.getProductName());
+                }
+                product.setQuantityInStock(product.getQuantityInStock() - 1);
+                productRepository.save(product);
+                return toOrderItemCombo(order, comboProduct);
+            }).collect(Collectors.toList());
+        }else {
+            orderItems = orderRequest.getOrderItems().stream().map(item -> {
+                Products product = productRepository.findById(item.getProductId())
+                        .orElseThrow(() -> new RuntimeException("Product not found"));
+                if (product.getQuantityInStock() < item.getQuantity()) {
+                    throw new RuntimeException("Not enough stock for product: " + product.getProductName());
+                }
+                product.setQuantityInStock(product.getQuantityInStock() - item.getQuantity());
+                productRepository.save(product);
+                return toOrderItem(order, item, product);
+            }).collect(Collectors.toList());
+        }
 
         order.setOrderItems(orderItems);
 
@@ -70,51 +87,7 @@ public class OrderServiceImpl implements OrderService {
 
         updateCart(customer, orderItems);
 
-        int amountInCents = (int) Math.round(savedOrder.getTotalAmount() * 100);
-        if ("stripe".equals(orderRequest.getPaymentMethod())) {
-            try {
-                PaymentIntent paymentIntent = paymentService.createPaymentIntent(
-                        amountInCents,
-                        "usd",
-                        "Order #" + savedOrder.getOrderId(),
-                        customer.getEmail()
-                );
-                Payment payment = new Payment();
-                payment.setOrder(savedOrder);
-                payment.setPaymentIntentId(paymentIntent.getId());
-                payment.setAmount(savedOrder.getTotalAmount());
-                payment.setCurrency("usd");
-                payment.setStatus("pending");
-
-                payment = paymentRepository.save(payment);
-                savedOrder.setPayment(payment);
-
-                if (paymentIntent.getStatus().equals("succeeded")) {
-                    savedOrder.setStatus(OrderStatus.PROCESSING);
-                } else {
-                    savedOrder.setStatus(OrderStatus.PENDING);
-                }
-
-                orderRepository.save(savedOrder);
-            } catch (StripeException e) {
-                log.error("Payment failed: {}", e.getMessage());
-                throw new RuntimeException("Payment failed: " + e.getMessage());
-            }
-        } else if ("cod".equals(orderRequest.getPaymentMethod())) {
-            Payment payment = new Payment();
-            payment.setOrder(savedOrder);
-            payment.setAmount(savedOrder.getTotalAmount());
-            payment.setCurrency("usd");
-            payment.setStatus("pending");
-
-            payment = paymentRepository.save(payment);
-            savedOrder.setPayment(payment);
-            savedOrder.setStatus(OrderStatus.PENDING);
-
-            orderRepository.save(savedOrder);
-        } else {
-            throw new IllegalArgumentException("Invalid payment method");
-        }
+        processPayment(savedOrder, orderRequest, customer);
 
         eventPublisher.publishEvent(new NewOrderEvent(this, order));
         return orderMapper.toOrderResponse(savedOrder);
@@ -208,6 +181,54 @@ public class OrderServiceImpl implements OrderService {
         return SuccessMessage.SUCCESS_UPDATED.getMessage();
     }
 
+    private void processPayment(Orders savedOrder, OrderRequest orderRequest, Customers customer) {
+        int amountInCents = (int) Math.round(savedOrder.getTotalAmount() * 100);
+        if ("stripe".equals(orderRequest.getPaymentMethod())) {
+            try {
+                PaymentIntent paymentIntent = paymentService.createPaymentIntent(
+                        amountInCents,
+                        "usd",
+                        "Order #" + savedOrder.getOrderId(),
+                        customer.getEmail()
+                );
+                Payment payment = new Payment();
+                payment.setOrder(savedOrder);
+                payment.setPaymentIntentId(paymentIntent.getId());
+                payment.setAmount(savedOrder.getTotalAmount());
+                payment.setCurrency("usd");
+                payment.setStatus("pending");
+
+                payment = paymentRepository.save(payment);
+                savedOrder.setPayment(payment);
+
+                if (paymentIntent.getStatus().equals("succeeded")) {
+                    savedOrder.setStatus(OrderStatus.PROCESSING);
+                } else {
+                    savedOrder.setStatus(OrderStatus.PENDING);
+                }
+
+                orderRepository.save(savedOrder);
+            } catch (StripeException e) {
+                log.error("Payment failed: {}", e.getMessage());
+                throw new RuntimeException("Payment failed: " + e.getMessage());
+            }
+        } else if ("cod".equals(orderRequest.getPaymentMethod())) {
+            Payment payment = new Payment();
+            payment.setOrder(savedOrder);
+            payment.setAmount(savedOrder.getTotalAmount());
+            payment.setCurrency("usd");
+            payment.setStatus("pending");
+
+            payment = paymentRepository.save(payment);
+            savedOrder.setPayment(payment);
+            savedOrder.setStatus(OrderStatus.PENDING);
+
+            orderRepository.save(savedOrder);
+        } else {
+            throw new IllegalArgumentException("Invalid payment method");
+        }
+    }
+
     private Customers getOrCreateCustomer(OrderRequest orderRequest) {
         if (orderRequest.getCustomerId() != null && orderRequest.getCustomerId() > 0) {
             log.info("Customer ID provided: {}", orderRequest.getCustomerId());
@@ -227,6 +248,14 @@ public class OrderServiceImpl implements OrderService {
         OrderItems orderItem = orderMapper.toOrderItem(item);
         orderItem.setProduct(product);
         orderItem.setOrder(order);
+        return orderItem;
+    }
+
+    private OrderItems toOrderItemCombo(Orders order, ComboProduct comboProduct) {
+        OrderItems orderItem = new OrderItems();
+        orderItem.setOrder(order);
+        orderItem.setProduct(comboProduct.getProduct());
+        orderItem.setQuantity(comboProduct.getQuantity());
         return orderItem;
     }
 

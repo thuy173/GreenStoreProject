@@ -41,4 +41,7 @@ public class OrderRequest {
 
     private List<OrderItemRequest> orderItems;
 
+    private boolean isComboOrder;
+
+    private Integer comboId;
 }
