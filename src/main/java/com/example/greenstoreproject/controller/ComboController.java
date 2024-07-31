@@ -1,6 +1,7 @@
 package com.example.greenstoreproject.controller;
 
 import com.example.greenstoreproject.bean.request.combo.ComboRequest;
+import com.example.greenstoreproject.bean.response.combo.ComboResponse;
 import com.example.greenstoreproject.entity.BMIStatus;
 import com.example.greenstoreproject.entity.Combo;
 import com.example.greenstoreproject.service.ComboService;
@@ -25,8 +26,8 @@ public class ComboController {
     }
 
     @GetMapping("/byBmi")
-    public ResponseEntity<List<Combo>> getCombosByBMI(@RequestParam BMIStatus bmiStatus) {
-        List<Combo> combos = comboService.getCombosByBMIStatus(bmiStatus);
+    public ResponseEntity<List<ComboResponse>> getCombosByBMI(@RequestParam BMIStatus bmiStatus) {
+        List<ComboResponse> combos = comboService.getCombosByBMIStatus(bmiStatus);
         return ResponseEntity.ok(combos);
     }
 

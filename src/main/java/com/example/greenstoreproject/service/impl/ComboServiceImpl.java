@@ -1,6 +1,7 @@
 package com.example.greenstoreproject.service.impl;
 
 import com.example.greenstoreproject.bean.request.combo.ComboRequest;
+import com.example.greenstoreproject.bean.response.combo.ComboResponse;
 import com.example.greenstoreproject.entity.BMIStatus;
 import com.example.greenstoreproject.entity.Combo;
 import com.example.greenstoreproject.mapper.ComboMapper;
@@ -11,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -20,8 +22,11 @@ public class ComboServiceImpl implements ComboService {
     private final ComboMapper comboMapper;
 
     @Override
-    public List<Combo> getCombosByBMIStatus(BMIStatus status) {
-        return comboRepository.findByBmiStatus(status);
+    public List<ComboResponse> getCombosByBMIStatus(BMIStatus status) {
+        List<Combo> combos = comboRepository.findByBmiStatus(status);
+        return combos.stream()
+                .map(comboMapper::toComboResponse)
+                .collect(Collectors.toList());
     }
 
     @Override
