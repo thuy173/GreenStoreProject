@@ -1,6 +1,7 @@
 package com.example.greenstoreproject.controller;
 
 import com.example.greenstoreproject.bean.request.bmi.BMICalculationRequest;
+import com.example.greenstoreproject.bean.response.bmi.BMIResponse;
 import com.example.greenstoreproject.entity.BMIStatus;
 import com.example.greenstoreproject.service.BMICalculationService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -19,8 +20,8 @@ public class BMIController {
     private final BMICalculationService bmiCalculationService;
 
     @PostMapping("/calculate")
-    public ResponseEntity<BMIStatus> calculateBMI(@RequestBody BMICalculationRequest request) {
-        BMIStatus bmiStatus = bmiCalculationService.calculateBMI(request.getWeight(), request.getHeight());
+    public ResponseEntity<BMIResponse> calculateBMI(@RequestBody BMICalculationRequest request) {
+        BMIResponse bmiStatus = bmiCalculationService.calculateBMI(request.getWeight(), request.getHeight());
         return ResponseEntity.ok(bmiStatus);
     }
 }

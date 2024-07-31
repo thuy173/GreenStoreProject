@@ -1,22 +1,27 @@
 package com.example.greenstoreproject.service.impl;
 
+import com.example.greenstoreproject.bean.response.bmi.BMIResponse;
 import com.example.greenstoreproject.entity.BMIStatus;
 import com.example.greenstoreproject.service.BMICalculationService;
 import org.springframework.stereotype.Service;
 
 @Service
 public class BMICalculationServiceImpl implements BMICalculationService {
+
     @Override
-    public BMIStatus calculateBMI(double weight, double height) {
+    public BMIResponse calculateBMI(double weight, double height) {
         double bmi = weight / (height * height);
+        BMIStatus status;
         if (bmi < 18.5) {
-            return BMIStatus.UNDERWEIGHT;
+            status = BMIStatus.UNDERWEIGHT;
         } else if (bmi < 25) {
-            return BMIStatus.NORMAL;
+            status = BMIStatus.NORMAL;
         } else if (bmi < 30) {
-            return BMIStatus.OVERWEIGHT;
+            status = BMIStatus.OVERWEIGHT;
         } else {
-            return BMIStatus.OBESE;
+            status = BMIStatus.OBESE;
         }
+
+        return new BMIResponse(bmi, status);
     }
 }
