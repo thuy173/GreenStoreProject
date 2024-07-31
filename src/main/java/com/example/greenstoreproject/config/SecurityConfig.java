@@ -67,6 +67,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/bmi/**").permitAll()
                         .requestMatchers("/api/combo/**").permitAll()
                         .requestMatchers("/api/plan").permitAll()
+                        .requestMatchers("/api/advice/**").permitAll()
                         .requestMatchers("/ws/**").permitAll()
                         .requestMatchers(AUTH_WHITELIST).permitAll()
                         .anyRequest().authenticated()
