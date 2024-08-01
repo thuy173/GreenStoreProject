@@ -26,7 +26,7 @@ public class Products {
     @Column(name = "quantity_in_stock")
     private Double quantityInStock;
 
-    @Column(name = "description")
+    @Column(name = "description", length = 65535)
     private String description;
 
     @Column(name = "manufacture_date")
