@@ -3,7 +3,9 @@ package com.example.greenstoreproject.service.impl;
 import com.example.greenstoreproject.bean.request.combo.ComboRequest;
 import com.example.greenstoreproject.bean.response.combo.ComboResponse;
 import com.example.greenstoreproject.entity.BMIStatus;
+import com.example.greenstoreproject.entity.Categories;
 import com.example.greenstoreproject.entity.Combo;
+import com.example.greenstoreproject.exception.NotFoundException;
 import com.example.greenstoreproject.mapper.ComboMapper;
 import com.example.greenstoreproject.repository.ComboRepository;
 import com.example.greenstoreproject.repository.ProductRepository;
@@ -27,6 +29,13 @@ public class ComboServiceImpl implements ComboService {
         return combos.stream()
                 .map(comboMapper::toComboResponse)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public ComboResponse getComboById(Integer id) {
+        Combo combo = comboRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Combo not found " + id));
+        return comboMapper.toComboResponse(combo);
     }
 
     @Override

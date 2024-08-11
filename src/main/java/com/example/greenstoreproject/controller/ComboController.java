@@ -37,11 +37,11 @@ public class ComboController {
 //        return ResponseEntity.ok(combos);
 //    }
 
-//    @GetMapping("/{comboId}")
-//    public ResponseEntity<Combo> getComboById(@PathVariable Long comboId) {
-//        Combo combo = comboService.getComboById(comboId);
-//        return ResponseEntity.ok(combo);
-//    }
+    @GetMapping("/{id}")
+    public ResponseEntity<ComboResponse> getComboById(@PathVariable Integer id) {
+        ComboResponse combo = comboService.getComboById(id);
+        return ResponseEntity.ok(combo);
+    }
 
 //    @PutMapping("/update/{comboId}")
 //    public ResponseEntity<Combo> updateCombo(@PathVariable Long comboId, @RequestBody ComboRequest request) {

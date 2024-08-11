@@ -44,7 +44,7 @@ public class PlanController {
         return ResponseEntity.ok(plan);
     }
 
-    @Scheduled(cron = "0 49 17 * * *")
+    @Scheduled(cron = "0 0 7 * * *")
     @Transactional
     public void sendDailyEmails() {
         List<Schedule> schedules = scheduleRepository.findByDate(LocalDate.now());
