@@ -2,6 +2,7 @@ package com.example.greenstoreproject.controller;
 
 import com.example.greenstoreproject.bean.request.plan.PlanRequest;
 import com.example.greenstoreproject.bean.response.plan.PlanResponse;
+import com.example.greenstoreproject.bean.response.plan.ScheduleResponse;
 import com.example.greenstoreproject.entity.Combo;
 import com.example.greenstoreproject.entity.Customers;
 import com.example.greenstoreproject.entity.Plan;
@@ -13,6 +14,7 @@ import com.example.greenstoreproject.service.EmailService;
 import com.example.greenstoreproject.service.PlanService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -51,5 +54,11 @@ public class PlanController {
         for (Schedule schedule : schedules) {
             emailService.sendDailyScheduleEmail(schedule.getPlan().getCustomer(), schedule);
         }
+    }
+
+    @GetMapping("/schedules")
+    public ResponseEntity<List<ScheduleResponse>> getSchedulesByDate(@RequestParam LocalDate date) {
+        List<ScheduleResponse> schedules = planService.getSchedulesByDate(date);
+        return ResponseEntity.ok(schedules);
     }
 }

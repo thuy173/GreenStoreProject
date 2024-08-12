@@ -4,6 +4,7 @@ import com.example.greenstoreproject.bean.request.plan.PlanRequest;
 import com.example.greenstoreproject.bean.request.plan.ScheduleProductRequest;
 import com.example.greenstoreproject.bean.request.plan.ScheduleRequest;
 import com.example.greenstoreproject.bean.response.plan.PlanResponse;
+import com.example.greenstoreproject.bean.response.plan.ScheduleResponse;
 import com.example.greenstoreproject.entity.*;
 import com.example.greenstoreproject.exception.NotFoundException;
 import com.example.greenstoreproject.mapper.PlanMapper;
@@ -14,6 +15,8 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -63,6 +66,14 @@ public class PlanServiceImpl implements PlanService {
 
         plan = planRepository.save(plan);
         return planMapper.toResponseDTO(plan);
+    }
+
+    @Override
+    public List<ScheduleResponse> getSchedulesByDate(LocalDate date) {
+        List<Schedule> schedules = planRepository.findSchedulesByDate(date);
+        return schedules.stream()
+                .map(planMapper::toResponseDTO)
+                .collect(Collectors.toList());
     }
 
 }
