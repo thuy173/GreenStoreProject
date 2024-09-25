@@ -34,8 +34,8 @@ This project is a RESTful API built using Spring Boot. It provides various endpo
    
 **note:
   - application.properties
-    spring.datasource.username=root
-    spring.datasource.password=12345678
+    -spring.datasource.username=root
+    -spring.datasource.password=12345678
 
 3. Run swagger html
 
