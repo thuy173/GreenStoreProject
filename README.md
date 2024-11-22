@@ -41,5 +41,3 @@ This project is a RESTful API built using Spring Boot. It provides various endpo
 
    http://localhost:8086/swagger-ui/index.html#/
 
-**Using api**
-- Account admin: admin@gmail.com - Admin*123
